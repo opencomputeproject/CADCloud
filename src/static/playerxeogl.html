@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>xeogl Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <script src="js/xeogl.js"></script>
+    <script src="js/OBJModel.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.6.2/bootstrap-slider.min.js"></script>
+
+    <script src="https://use.fontawesome.com/9c715fd6df.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64.js"></script>
+
+    <style>
+    body {
+    font-size: 15px;
+    line-height: 1.50;
+    color: white;
+    width:1920px;
+    background-color: black;
+    text-decoration: none;
+    word-spacing: normal;
+    text-align: left;
+    letter-spacing: 0;
+    -webkit-font-smoothing: antialiased;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    margin: 0;
+    }
+#info {
+  height: calc(100vh - 1px);
+  overflow-y: scroll;
+    text-align: left;
+    direction:rtl; 
+
+    position: absolute;
+    top: 0px;
+    z-index: 200000;
+    /*font-weight: 600;*/
+    float: left;
+    left: 0px;
+    padding: 10px;
+    /*border-radius: 0 0 4px 0;*/
+    /*border-radius:6px;*/
+    // height: auto;
+    /*border: solid 1px #bdbcbc;*/
+//    pointer-events: none;
+}
+    .tree, .tree ul {
+        margin:0;
+        padding:0;
+        list-style:none;
+        margin-left:10px;
+    }
+    .tree ul {
+        margin-left:1em;
+        position:relative
+    }
+    .tree ul ul {
+        margin-left:.5em
+    }
+    .tree ul:before {
+        content:"";
+        display:block;
+        width:0;
+        position:absolute;
+        top:0;
+        bottom:0;
+        left:0;
+        border-left:1px solid
+    }
+    .tree li {
+        margin:0;
+        padding:0 1em;
+        line-height:2em;
+        color:#fff;
+        font-weight:700;
+        position:relative
+    }
+    .tree ul li:before {
+        content:"";
+        display:block;
+        width:10px;
+        height:0;
+        border-top:1px solid;
+        margin-top:-1px;
+        position:absolute;
+        top:1em;
+        left:0
+    }
+    .tree ul li:last-child:before {
+        background:#000;
+        height:auto;
+        top:1em;
+        bottom:0
+    }
+    .indicator {
+        margin-right:5px;
+    }
+    .tree li a {
+        text-decoration: none;
+        color:#369;
+    }
+    .tree li button, .tree li button:active, .tree li button:focus {
+        text-decoration: none;
+        color:#369;
+        border:none;
+        background:transparent;
+        margin:0px 0px 0px 0px;
+        padding:0px 0px 0px 0px;
+        outline: 0;
+    }
+    .fa {
+	display: contents;
+    }
+</style>
+
+<body>
+    <div class="container-fluid">
+    <div class="row">
+	<div class="col" id="info" style="width:30%; position:fixed">
+	        <h1>3D Web models viewer </h1>
+	        <p><b>(c) 2019 Jean-Marie Verdun<b><br>
+	        This demo is built on top of FreeCAD 0.19 used to
+	        save on the justyour.parts server </p>
+	        <p>Use your mouse to rotate the model (left mouse button kept pressed)<br>
+	        Press A to left pan the model<br>
+	        Press D to right pan the model<br>
+	        Simple click on a Part to hide it. Click within this list entry to reactivate<br>
+	        the part</p>
+	        <ul id="log"></ul>
+
+		TREE
+
+	  </div>
+	  <div class="col" style="width:70%; position:fixed">
+	<script>
+
+	// Let's manage the tree
+	var transluscent = 0;
+
+	 $.fn.extend({
+	        treed: function (scene, partNb) {
+	          var openedClass = 'fa-minus-circle';
+	          var closedClass = 'fa-plus-circle';
+	            //initialize each of the top levels
+	            var tree = $(this);
+	            tree.addClass("tree");
+	            tree.find('li').has("ul").each(function () {
+	                var branch = $(this); //li with children ul
+	                branch.prepend("<i class='fa "+ closedClass +"'></i>");
+	                branch.addClass('branch');
+	                branch.on('click', function (e) {
+	                    if (this == e.target) {
+	                        var icon = $(this).children('i:first');
+	                        icon.toggleClass(openedClass );
+	                        $(this).children().children().toggle();
+	                    }
+	                })
+	                branch.children().children().toggle();
+	            });
+		    tree.find('li').each(function () {
+			var leaf = $(this);
+			if ( leaf.attr('id') ) {
+				$('#'+leaf.attr('id')).on('click', function (e) {
+					// We must switched the element from the tree
+					// The color must go red
+					// Must hide the mesh
+					if ( partNb == -1 ) {
+						name = "Part0"
+						for (var id in scene.models[name].meshes) {
+                                                           if ( id == name + "#" + leaf.attr('id') ) {
+                                                                if ( scene.models[name].meshes[id].visible == true ) {
+                                                                        scene.models[name].meshes[id].visible = false;
+                                                                        $('#'+leaf.attr('id')).css("color", "red");
+                                                                } else {
+                                                                        scene.models[name].meshes[id].visible = true;
+                                                                        $('#'+leaf.attr('id')).css("color", "white");
+                                                                }
+                                                           }
+						}
+					} else {
+						for ( i = 0 ; i <= partNb ; i++ ) {
+							name = "Part" + i.toString(10);
+							for (var id in scene.models[name].meshes) {
+	                                                   if ( id == name + "#" + leaf.attr('id') ) {
+								if ( scene.models[name].meshes[id].visible == true ) {
+		                                                        scene.models[name].meshes[id].visible = false;
+				                                        $('#'+leaf.attr('id')).css("color", "red");
+								} else {
+									scene.models[name].meshes[id].visible = true;
+				                                        $('#'+leaf.attr('id')).css("color", "white");
+								}
+	                                                   }
+	                                                }
+	                                       	}
+					}
+					
+				});
+				$('#'+leaf.attr('id')).on('mouseover', function (e) {
+					if ( partNb == -1 ) {
+						name = "Part0"
+						for (var id in scene.models[name].meshes) {
+                                                           if ( id != name + "#" + leaf.attr('id') ) {
+                                                                scene.models[name].meshes[id].ghosted = true;
+                                                                transluscent = 1;
+                                                           }
+                                                           else
+                                                           {
+                                                                scene.models[name].meshes[id].ghosted=false;
+                                                           }
+                                                 }
+					} else {
+					
+						for ( i = 0 ; i <= partNb ; i++ ) {
+							name = "Part" + i.toString(10);
+							for (var id in scene.models[name].meshes) {
+							   if ( id != name + "#" + leaf.attr('id') ) {
+								scene.models[name].meshes[id].ghosted = true;
+								transluscent = 1;
+							   }
+							   else
+							   {
+								scene.models[name].meshes[id].ghosted=false;
+							   }
+							}
+						}
+					}
+                                });
+			}
+		    });
+	            //fire event from the dynamically added icon
+	          tree.find('.branch .indicator').each(function(){
+	            $(this).on('click', function () {
+	                $(this).closest('li').click();
+	            });
+	          });
+	            //fire event to open branch if the li contains an anchor instead of text
+	            tree.find('.branch>a').each(function () {
+	                $(this).on('click', function (e) {
+	                    $(this).closest('li').click();
+	                    e.preventDefault();
+	                });
+	            });
+	            //fire event to open branch if the li contains a button instead of text
+	            tree.find('.branch>button').each(function () {
+	                $(this).on('click', function (e) {
+	                    $(this).closest('li').click();
+	                    e.preventDefault();
+	                });
+	            });
+		tree.css("display","");
+	        }
+	 });
+
+
+
+	    var Model = new xeogl.Group({
+	    aabbVisible: true,
+	    children: [ 
+			new xeogl.OBJModel({
+			        id: "Part0",
+			        src: "MODELSOURCE",
+			}).on("loaded", function () {
+				var cameraFlight = new xeogl.CameraFlightAnimation();
+				cameraFlight.flyTo(Model.scene);
+			})
+	    	      ]
+	    });
+
+	    NEWCODE
+	
+	    
+            $('#tree1').treed(Model.scene, partNb);
+
+	    var input = Model.scene.input;
+	    input.on("mouseclicked",function (coords) {
+		var hit = Model.scene.pick({
+	                    canvasPos: coords
+	                });
+	                if (hit) {
+			    hit.mesh.visible = false;
+			    var li = document.createElement("li");
+			    // hit.mesh.id contains the name of the element which has been hit
+			    var field = hit.mesh.id.split("#");
+			    // we need to find field[1] into the tree
+	                    $('#'+field[1]).css("color", "red");
+	                } 
+	    });
+	    // Enable camera interaction
+	    new xeogl.CameraControl();
+
+
+    var lastEntity = null;
+    var lastColorize = null;
+
+    input.on("mousemove", function (coords) {
+	// If model status is transluscent we shall update them
+	if ( transluscent == 1 ) {
+		if ( partNb == -1 ) {
+			name = "Part0"
+			for (var id in Model.scene.models[name].meshes) {
+                                    Model.scene.models[name].meshes[id].ghosted=false;
+                        } 
+		} else {
+			for ( i = 0 ; i <= partNb ; i++ ) {
+				name = "Part" + i.toString(10);
+				for (var id in Model.scene.models[name].meshes) {
+		 			Model.scene.models[name].meshes[id].ghosted=false;
+				}
+			}
+		}
+		transluscent = 0;
+	}
+        var hit = Model.scene.pick({
+            canvasPos: coords
+        });
+
+        if (hit) {
+
+            if (!lastEntity || hit.mesh.id !== lastEntity.id) {
+
+                if (lastEntity) {
+                    lastEntity.colorize = lastColorize;
+                }
+
+                lastEntity = hit.mesh;
+                lastColorize = hit.mesh.colorize.slice();
+
+                hit.mesh.colorize = [0.0, 1.0, 0.0, 1.0];
+            }
+        } else {
+
+            if (lastEntity) {
+                lastEntity.colorize = lastColorize;
+                lastEntity = null;
+            }
+        }
+    });
+
+
+	</script>
+	</div>
+     </div>
+</div>
+</body>
+</html>

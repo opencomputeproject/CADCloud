@@ -1,0 +1,135 @@
+# MIT License
+#
+# Copyright (c) 2020 CADCloud
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+kill_named_process()
+{
+        name=$1
+        pid=`pgrep "$1"`
+	arr=($pid)
+        if [[ "$pid" != "" ]]; then
+                kill -9 ${arr[${#arr[@]}-1]}
+        fi
+}
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+if [[ 'command -v minio' == "" ]]; then
+\mkdir bin
+cd bin
+wget https://dl.min.io/server/minio/release/linux-amd64/minio
+chmod 755 minio
+export PATH=$PATH:./bin
+cd ..
+fi
+fi
+
+
+# Start FreeCAD backend infrastructure
+export GOPATH=$GOPATH:$HOME/dev/git/myserver/
+go get golang.org/x/crypto/bcrypt
+go get golang.org/x/net/idna
+kill_named_process master
+kill_named_process users
+kill_named_process storage
+kill_named_process minioServer
+kill_named_process cacheServer
+kill_named_process freecad
+kill_named_process projects
+# We stop minio server for development purpose
+echo "DEVELOPMENT MODE = KILLING MINIO SERVERS"
+# kill_named_process minio
+cd src
+PWD=`pwd`
+echo $PWD
+export STATIC_ASSETS_DIR=$PWD/static/
+export TEMPLATES_DIR=$PWDc/templates/
+export TLS_KEY_PATH=../tools/certificat.key.unlock
+export TLS_CERT_PATH=../tools/certificat.crt
+\mkdir $HOME/certCache
+export CERT_STORAGE=$HOME/certCache
+export CREDENTIALS_TCPPORT=:9100
+export CREDENTIALS_URI=127.0.0.1
+export STORAGE_TCPPORT=:9200
+export MINIO_TCPPORT=:9300
+export FREECAD_URI=127.0.0.1
+export FREECAD_TCPPORT=:9210
+export FREECAD_BINARY=$HOME/dev/build/bin/freecad
+export FREECAD_TEMPLATE=$PWD/../freecad/
+export FREECAD_TEMP=$PWD/../root/freecad/
+export PROJECT_URI=127.0.0.1
+export PROJECT_TCPPORT=:9211
+export PROJECT_MINIO_TCPPORT=:9212
+export PROJECT_TEMP=$PWD/../root/projects/
+if [[ ! -d $PROJECT_TEMP ]]; then
+\mkdir $PROJECT_TEMP 
+fi
+if [[ ! -d $FREECAD_TEMP ]]; then
+\mkdir $FREECAD_TEMP
+fi
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+export DNS_DOMAIN=`hostname -A`
+else
+export DNS_DOMAIN=""
+fi
+# PORT 9400 - 9499 are reserved for local minIO server
+
+export STORAGE_URI=127.0.0.1
+export STORAGE_ROOT=$PWD/../root
+if [[ ! -d $STORAGE_ROOT/html ]]; then
+\mkdir $STORAGE_ROOT/html
+fi
+\cp static/playerxeogl.html $STORAGE_ROOT/html
+ls -lta $STORAGE_ROOT/html
+export MINIO_ROOT=$HOME/dev/minio
+export MINIO_URI=127.0.0.1
+export CACHE_URI=127.0.0.1
+export CACHE_TCPPORT=:9500
+export TZ=GMT
+echo "Please set the following environement variables in PRODUCTION mode
+export SMTP_SERVER=
+export SMTP_ACCOUNT=
+export SMTP_PASSWORD=
+export CERT_STORAGE=
+VALIDATE THE MINIO_ROOT VARIABLE IN THAT SCRIPT WHICH MUST POINT TO THE STORAGE SUBSYSTEM"
+
+cd backend
+go build storage.go
+./storage >& ../logs/storage.log &
+go build freecad.go
+./freecad  >& ../logs/freecad.log &
+go build cacheServer.go
+./cacheServer >& ../logs/cacheServer.log &
+go build minioServer.go
+./minioServer >& ../logs/minioServer.log &
+[[ -d ../logs/minIO ]] || mkdir ../logs/minIO
+cd ../credential
+go build users.go
+./users >& ../logs/users.log &
+go build projects.go
+./projects >& ../logs/projects.log &
+cd ../frontend
+go build master.go
+
+# Only on linux we must allow the daemon to attach to port 443 and 80
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+	sudo setcap cap_net_bind_service=+ep ./master
+fi
+./master >& ../logs/master.log &
+

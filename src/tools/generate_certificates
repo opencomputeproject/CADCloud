@@ -1,0 +1,6 @@
+openssl genrsa -aes256 -out certificat.key 4096
+openssl rsa -in certificat.key -out certificat.key.unlock
+openssl req -new -key certificat.key -out certificat.csr
+openssl x509 -req -days 365 -in certificat.csr -signkey certificat.key -out certificat.crt
+
+

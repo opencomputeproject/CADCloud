@@ -1,0 +1,13 @@
+.tooltip.in {
+  opacity: 1;
+}
+.slider.slider-horizontal{
+ width:100%;
+}
+.col0::-webkit-scrollbar{
+ display:none;
+}
+.list-group-item.active{
+ background-color:#757575;
+ border-color: #d6d6d6;
+}

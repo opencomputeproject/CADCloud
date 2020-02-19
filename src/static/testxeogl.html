@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>xeogl Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <script src="js/xeogl.js"></script>
+    <script src="js/OBJModel.js"></script>
+    <style>
+    body {
+    font-size: 15px;
+    line-height: 1.50;
+    color: white;
+    background-color: black;
+    text-decoration: none;
+    word-spacing: normal;
+    text-align: left;
+    letter-spacing: 0;
+    -webkit-font-smoothing: antialiased;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    margin: 0;
+    }
+#info {
+    position: absolute;
+    top: 0px;
+    z-index: 200000;
+    /*font-weight: 600;*/
+    float: left;
+    left: 0px;
+    padding: 10px;
+    /*border-radius: 0 0 4px 0;*/
+    /*border-radius:6px;*/
+    height: auto;
+    text-align: left;
+    /*border: solid 1px #bdbcbc;*/
+//    pointer-events: none;
+}
+</style>
+
+<body>
+    <div id="info">
+        <h1>3D Web models viewer - Experimental code based on xeogl</h1>
+	<p><b>(c) 2019 Jean-Marie Verdun<b><br>
+	This demo is based on IBM/Google Zaius server design platform redrawn with
+	FreeCAD 0.19, saved on the justyour.parts server and converted into OBJ directly
+	readable by xeogl Javascript code</p>
+	<p>Use your mouse to rotate the model (left mouse button kept pressed)<br>
+	Press A to left pan the model<br>
+	Press D to right pan the model<br>
+	Simple click on a Part to hide it. Click within this list entry to reactivate<br>
+        the part</p>
+        <ul id="log"></ul>
+    </div>
+<script>
+
+    var ZaiusModel = new xeogl.OBJModel({
+        id: "ZaiusModel",
+        src: "/test.obj",
+    });
+
+
+    // Fit to view when both models are loaded
+    ZaiusModel.on("loaded", function () {
+    // Let's print Mesh name into the console
+    for (var id in ZaiusModel.meshes) {
+	    var mesh = ZaiusModel.meshes[id];
+    }
+            var cameraFlight = new xeogl.CameraFlightAnimation();
+            cameraFlight.flyTo(ZaiusModel.scene);
+    });
+    var input = ZaiusModel.scene.input;
+    input.on("mouseclicked",function (coords) {
+	var hit = ZaiusModel.scene.pick({
+                    canvasPos: coords
+                });
+                if (hit) {
+		    hit.mesh.visible = false;
+		    var li = document.createElement("li");
+		    li.appendChild(document.createTextNode(hit.mesh.id));
+		    li.onclick = function() {
+			hit.mesh.visible = true;
+			li.remove();
+		    }
+		    document.getElementById("log").appendChild(li);
+                } 
+    });
+    // Enable camera interaction
+    new xeogl.CameraControl();
+</script>
+</body>
+</html>
