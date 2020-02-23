@@ -990,33 +990,35 @@ func start_minio() {
 
 	        response, err := base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
 
-
-
 	        if err != nil {
-	                log.Fatal(err)
-	        } else {
-	                defer response.Body.Close()
-	                contents, _ := ioutil.ReadAll(response.Body)
-	  	        // I must parse the output
-	                type Code struct {
-	                        XMLName   xml.Name `xml:"Error"`
-	                        CodeName string `xml:"Code"`
-	                }
+			// Error might be caused by the fact that the daemon is not running yet
+			for err != nil {
+                                        time.Sleep(1*time.Second)
+                                        response,err = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+                        }
+	        } 
 
-	                XMLcontents := Code{}
-	                in := bytes.NewReader([]byte(contents))
-	                _ = xml.NewDecoder(in).Decode(&XMLcontents)
-	                if ( XMLcontents.CodeName == "NoSuchBucket" ) {
-	                        // We must create the bucket
-
-	                        fullPath := "/"+value+"/"
-
-	                        method := "PUT"
-
-				_,_ = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
-
+                defer response.Body.Close()
+                contents, _ := ioutil.ReadAll(response.Body)
+  	        // I must parse the output
+                type Code struct {
+                        XMLName   xml.Name `xml:"Error"`
+                        CodeName string `xml:"Code"`
                 }
-	}
+
+                XMLcontents := Code{}
+                in := bytes.NewReader([]byte(contents))
+                _ = xml.NewDecoder(in).Decode(&XMLcontents)
+                if ( XMLcontents.CodeName == "NoSuchBucket" ) {
+                        // We must create the bucket
+
+                        fullPath := "/"+value+"/"
+
+                        method := "PUT"
+
+			_,_ = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+
+               	}
 	}
 
 
