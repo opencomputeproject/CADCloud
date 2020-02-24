@@ -998,27 +998,31 @@ func start_minio() {
                         }
 	        } 
 
-                defer response.Body.Close()
-                contents, _ := ioutil.ReadAll(response.Body)
-  	        // I must parse the output
-                type Code struct {
-                        XMLName   xml.Name `xml:"Error"`
-                        CodeName string `xml:"Code"`
-                }
+		init := 0 
+		for init != 1 {
+	                defer response.Body.Close()
+	                contents, _ := ioutil.ReadAll(response.Body)
+	  	        // I must parse the output
+	                type Code struct {
+	                        XMLName   xml.Name `xml:"Error"`
+	                        CodeName string `xml:"Code"`
+	                }
 
-                XMLcontents := Code{}
-                in := bytes.NewReader([]byte(contents))
-                _ = xml.NewDecoder(in).Decode(&XMLcontents)
-                if ( XMLcontents.CodeName == "NoSuchBucket" ) {
-                        // We must create the bucket
-
-                        fullPath := "/"+value+"/"
-
-                        method := "PUT"
-
-			_,_ = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
-
-               	}
+	                XMLcontents := Code{}
+	                in := bytes.NewReader([]byte(contents))
+	                _ = xml.NewDecoder(in).Decode(&XMLcontents)
+	                if ( XMLcontents.CodeName == "NoSuchBucket" ) {
+	                        // We must create the bucket
+	                        fullPath := "/"+value+"/"
+	                        method := "PUT"
+				_,_ = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+				init = 1
+	               	} 
+			if ( XMLcontents.CodeName == "XMinioServerNotInitialized" ) {
+				time.Sleep(1*time.Second)
+				response,err = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+			}
+		}
 	}
 
 
