@@ -990,11 +990,16 @@ func start_minio() {
 
 	        response, err := base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
 
-
-
 	        if err != nil {
-	                log.Fatal(err)
-	        } else {
+			// Error might be caused by the fact that the daemon is not running yet
+			for err != nil {
+                                        time.Sleep(1*time.Second)
+                                        response,err = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+                        }
+	        } 
+
+		init := 0 
+		for init != 1 {
 	                defer response.Body.Close()
 	                contents, _ := ioutil.ReadAll(response.Body)
 	  	        // I must parse the output
@@ -1008,15 +1013,16 @@ func start_minio() {
 	                _ = xml.NewDecoder(in).Decode(&XMLcontents)
 	                if ( XMLcontents.CodeName == "NoSuchBucket" ) {
 	                        // We must create the bucket
-
 	                        fullPath := "/"+value+"/"
-
 	                        method := "PUT"
-
 				_,_ = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
-
-                }
-	}
+				init = 1
+	               	} 
+			if ( XMLcontents.CodeName == "XMinioServerNotInitialized" ) {
+				time.Sleep(1*time.Second)
+				response,err = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+			}
+		}
 	}
 
 

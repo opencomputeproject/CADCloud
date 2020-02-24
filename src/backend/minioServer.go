@@ -497,9 +497,38 @@ func createMinIOServer(username string, URL string, accessToken string, secretTo
 
                 method := "PUT"
 
-                _,_ = base.Request(method, "http://"+address[0]+":"+sCtrl+fullPath, fullPath, "application/octet-stream", nil, "", accessToken, secretToken)
+                response,err := base.Request(method, "http://"+address[0]+":"+sCtrl+fullPath, fullPath, "application/octet-stream", nil, "", accessToken, secretToken)
 
+		for err != nil {
+                         time.Sleep(1*time.Second)
+                         response,err = base.Request(method, "http://"+address[0]+":"+sCtrl+fullPath, fullPath, "application/octet-stream", nil, "", accessToken, secretToken)
+                }
 
+		init := 0
+		// We can move forward
+		for init != 1 {
+			defer response.Body.Close()
+			contents, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+			// Got an XML content with the various Buckets created by the end user
+			type Content struct {
+				XMLName     xml.Name `xml:"Error"`
+				Code string `xml:"Code"`
+			}
+			XMLcontents := Content{}
+			in := bytes.NewReader([]byte(contents))
+			err = xml.NewDecoder(in).Decode(&XMLcontents)
+			if ( err == nil ) {
+				if ( XMLcontents.Code == "XMinioServerNotInitialized" ) {
+					time.Sleep(1*time.Second)
+					response,err = base.Request(method, "http://"+address[0]+":"+sCtrl+fullPath, fullPath, "application/octet-stream", nil, "", accessToken, secretToken)
+				} 
+			} else {
+				init = 1
+			}
+		}
 
 		// We need to return some informations like
 		// the minIO IP address, the TCPPORT
