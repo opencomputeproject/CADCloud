@@ -198,6 +198,12 @@ function mainpage(){
 	navbarHover();
 	loginBtn();
 	loadHTML("home.html");
+
+	if (( "string" !== typeof(mylocalStorage['secretKey']) ) & ( "string" !== typeof(mylocalStorage['accessKey']) ))
+	{
+		$('#signup').css("display", "");
+	}
+
 	loadJS("js/projects.js");
 	loadJS("js/forms.js");
 	loadJS("js/base.js");
