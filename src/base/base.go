@@ -115,7 +115,9 @@ var smtpAccount =  os.Getenv("SMTP_ACCOUNT")
 var smtpPassword = os.Getenv("SMTP_PASSWORD")
 
 func SendEmail(email string, subject string, validationString string) {
-    from := mail.Address{"", smtpAccount+"@"+smtpServer}
+    servername := smtpServer
+    host, _, _ := net.SplitHostPort(servername)
+    from := mail.Address{"", smtpAccount+"@"+host}
     to   := mail.Address{"", email}
     subj := subject
     body := validationString
@@ -134,9 +136,6 @@ func SendEmail(email string, subject string, validationString string) {
     message += "\r\n" + body
 
     // Connect to the SMTP Server
-    servername := smtpServer+":25"
-
-    host, _, _ := net.SplitHostPort(servername)
 
     auth := smtp.PlainAuth("",smtpAccount, smtpPassword, host)
 
