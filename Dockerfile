@@ -61,7 +61,7 @@ RUN apt install -y apt-utils
 RUN apt install -y golang-1.10 golang-1.10-go golang-1.10-race-detector-runtime golang-1.10-src golang-go golang-race-detector-runtime golang-src
 RUN apt-get update && apt-get install --no-install-recommends -y ca-certificates && rm -rf /var/lib/apt/lists/*
 RUN cat /etc/apt/sources.list
-RUN apt-get update && apt install -qq -y build-essential libssl-dev libcurl4-gnutls-dev libexpat1-dev gettext unzip wget xvfb snapd squashfuse fuse snap-confine sudo fontconfig vim
+RUN apt-get update && apt install -qq -y build-essential libssl-dev libcurl4-gnutls-dev libexpat1-dev gettext unzip wget xvfb snapd squashfuse fuse snap-confine sudo fontconfig vim rand
 RUN apt-get -y install git
 RUN go get golang.org/x/crypto/bcrypt
 RUN go get golang.org/x/net/idna
@@ -73,6 +73,7 @@ RUN go build -o bin/minioServer src/backend/minioServer.go
 RUN go build -o bin/users src/credential/users.go
 RUN go build -o bin/projects src/credential/projects.go
 RUN go build -o bin/master src/frontend/master.go
+RUN src/tools/generate_certificates
 
 RUN chmod 777 /app/start_container
 RUN systemctl enable snapd
