@@ -34,7 +34,7 @@ Cloud.cloudrestore(u"YOUR MODEL NAME (lowercase only)")
 
 The Docker container requires at least 2 CPUs, 4 GB, 4 GB of RAM / Storage. This is due to the fact that it is runs FreeCAD and minio locally.
 
-Please edit the `start_container` file and add the following data to your relevant server
+Please edit the `start_container` file and add the following data to your relevant server ( the SMTP_SERVER must include the port name -> <myserver:25 or myserver:587> as an example )
 
 ```bash
 export SMTP_SERVER=
