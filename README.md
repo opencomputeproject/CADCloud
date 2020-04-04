@@ -72,6 +72,12 @@ execution is done it will spawn the various CADCloud daemons.
 
 You now will be able to enjoy a local instance of CADCloud! 
 
+If you use chrome, please activate this option, this will allow self signed certificate running from localhost server (your docker image) to be accepted by your browser (copy/paste it within the URL path of your browser)
+
+chrome://flags/#allow-insecure-localhost
+
+If you use Firefox, just accept to pursue the browsing using an insecure connection.
+
 In your preferred web browser type: `https://127.0.0.1` in the URL field. 
 
 Enjoy, debug and issue PR(s) !
