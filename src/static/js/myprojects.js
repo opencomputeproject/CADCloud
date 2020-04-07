@@ -37,7 +37,7 @@ function addCard(cardImage, xeoglCode, Date, Name, Revision, Owner, Revisions, D
 		'<div id="Btn'+Date+'-'+Owner+'-'+Name+'-'+Revision+'" class="btn btn-primary" style="margin-bottom:2rem;">3D View</div>' +
 		'<div id="BtnDeleteRevision'+Date+'-'+Owner+'-'+Name+'-'+Revision+'" class="btn btn-primary btn-warning" style="margin-bottom:2rem; margin-left:5px">Delete Revision</div>' +
 		'<div id="BtnDeleteProject'+Date+'-'+Owner+'-'+Name+'-'+Revision+'" class="btn btn-primary btn-danger" style="margin-bottom:2rem; margin-left:5px;">Delete Project</div>' +
-		'<div class="custom-control custom-switch" style="position:fixed; right:5px; margin-top:-20px;">';
+		'<div class="custom-control custom-switch" style="position:absolute; right:0px; margin-top:-15px;">';
 
 	if ( Private == "0" )
 	{
