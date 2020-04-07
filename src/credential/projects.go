@@ -1022,11 +1022,12 @@ func start_minio() {
 				time.Sleep(1*time.Second)
 				response,err = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
 			}
+			if (  XMLcontents.CodeName == "" ) {
+				// there has been no error so we can safely exit the loop
+				init = 1
+			}
 		}
 	}
-
-
-
 }
 
 

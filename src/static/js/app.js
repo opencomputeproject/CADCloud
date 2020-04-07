@@ -147,8 +147,8 @@ function myProjects()
 			<h2><div closs="col " style="width:80%; right:0px; position:fixed;" id="title1"></div></h2>\
 			</div>\
 			<div class="container-fluid" style="padding-left:2px;"><div class="row" id="Row1">\
-                        <div class="col offset col0" style="width:20%; position:fixed; overflow-y:scroll; height:80%; top:140px" id="col0"></div>\
-                        <div closs="col " style="width:80%; right:0px; position:fixed; top:140px" id="col1"></div>\
+                        <div class="col offset col0" style="width:20%; position:fixed; overflow-y:scroll; height:calc(100vh - 140px); top:140px" id="col0"></div>\
+                        <div closs="col " style="width:80%; right:0px; position:fixed; overflow-y:scroll; height:calc(100vh - 140px);top:140px" id="col1"></div>\
                         <div class="row"><div class="col" style="width:100%" id="col3"></div></div>';
         $(document.body).append(layout);
 	loadCSS("css/projects.css");
