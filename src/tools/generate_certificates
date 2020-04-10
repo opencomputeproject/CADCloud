@@ -1,7 +1,7 @@
 rand > /root/.rnd
-openssl genrsa -out /app/src/tools/certificat.key 4096
-openssl rsa -in /app/src/tools/certificat.key -out /app/src/tools/certificat.key.unlock
-openssl req -new -key /app/src/tools/certificat.key -out /app/src/tools/certificat.csr -subj "/C=US/ST=NRW/L=Houston/O=Jon Doe/OU=DevOps/CN=www.example.com/emailAddress=dev@www.example.com"
-openssl x509 -req -days 365 -in /app/src/tools/certificat.csr -signkey /app/src/tools/certificat.key -out /app/src/tools/certificat.crt
+openssl genrsa -out certificat.key 4096
+openssl rsa -in certificat.key -out certificat.key.unlock
+openssl req -new -key certificat.key -out certificat.csr -subj "/C=US/ST=NRW/L=Houston/O=Jon Doe/OU=DevOps/CN=www.example.com/emailAddress=dev@www.example.com"
+openssl x509 -req -days 365 -in certificat.csr -signkey certificat.key -out certificat.crt
 
 
