@@ -27,6 +27,7 @@ import (
     "net/http"
     "net/http/httputil"
     "net/url"
+    "net"
     "os"
     "bytes"
     "log"
@@ -180,7 +181,9 @@ func user(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// parse the url
-	url, _ := url.Parse("http://"+r.Host+":9100")
+	u,_ := url.Parse("http://"+r.Host)
+        host, _, _ := net.SplitHostPort(u.Host)
+	url, _ := url.Parse("http://"+host+":9100")
 
 	// create the reverse proxy
 	proxy := httputil.NewSingleHostReverseProxy(url)
