@@ -26,8 +26,8 @@ Xvfb :5 -screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix -fbdir /tmp &
 
 export DISPLAY=:5
 
-export TLS_KEY_PATH=/app/src/tools/certificat.key.unlock
-export TLS_CERT_PATH=/app/src/tools/certificat.crt
+export TLS_KEY_PATH=/app/certificat.key.unlock
+export TLS_CERT_PATH=/app/certificat.crt
 export STATIC_ASSETS_DIR=/app/src/static/
 export TEMPLATES_DIR=/app/src/templates/
 export CREDENTIALS_TCPPORT=:9100
