@@ -73,7 +73,6 @@ RUN go build -o bin/minioServer src/backend/minioServer.go
 RUN go build -o bin/users src/credential/users.go
 RUN go build -o bin/projects src/credential/projects.go
 RUN go build -o bin/master src/frontend/master.go
-RUN src/tools/generate_certificates
 
 RUN chmod 777 /app/start_container
 RUN systemctl enable snapd

@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 if [[ ! -f src/tools/certificat.crt ]]; then
-cd src/tools
+cd scripts
 ./generate_certificates
-cd ../..
+cd ..
 fi
 docker build -t cadcloud .
