@@ -69,10 +69,12 @@ export SMTP_PASSWORD=
 export CERT_STORAGE=
 VALIDATE THE MINIO_ROOT VARIABLE IN THAT SCRIPT WHICH MUST POINT TO THE STORAGE SUBSYSTEM"
 
-
 cd /app/bin
-wget https://dl.min.io/server/minio/release/linux-amd64/minio
-chmod 755 minio
+DIR="/app/bin/"
+if [ ! -f "$DIR/minio" ]; then
+  wget https://dl.min.io/server/minio/release/linux-amd64/minio
+  chmod 755 minio
+fi
 export PATH=$PATH:/app/bin
 ./storage > ../src/logs/storage.log &
 ./freecad  > ../src/logs/freecad.log &
