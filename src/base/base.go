@@ -117,7 +117,14 @@ var smtpPassword = os.Getenv("SMTP_PASSWORD")
 func SendEmail(email string, subject string, validationString string) {
     servername := smtpServer
     host, _, _ := net.SplitHostPort(servername)
-    from := mail.Address{"", smtpAccount+"@"+host}
+    // If I have a short login (aka the login do not contain the domain name from the SMTP server)
+    shortName,_ := strings.Split(smtpAccount, "@")
+    var from mail.Address
+    if ( len(shortName) > 1 ) {
+	from = mail.Address{"", smtpAccount}
+    } else
+	from = mail.Address{"", smtpAccount+"@"+host}
+    }
     to   := mail.Address{"", email}
     subj := subject
     body := validationString

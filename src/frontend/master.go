@@ -53,6 +53,8 @@ var tlsCertPath = os.Getenv("TLS_CERT_PATH")
 var tlsKeyPath = os.Getenv("TLS_KEY_PATH")
 var DNSDomain = os.Getenv("DNS_DOMAIN")
 var certStorage = os.Getenv("CERT_STORAGE")
+var credentialUri = os.Getenv("CREDENTIALS_URI")
+var credentialPort = os.Getenv("CREDENTIALS_TCPPORT")
 
 type Content struct {
     XMLName     xml.Name `xml:"Document"`
@@ -180,7 +182,7 @@ func user(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// parse the url
-	url, _ := url.Parse("http://"+r.Host+":9100")
+	url, _ := url.Parse("http://"+credentialUri+credentialPort)
 
 	// create the reverse proxy
 	proxy := httputil.NewSingleHostReverseProxy(url)
