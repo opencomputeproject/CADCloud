@@ -118,12 +118,12 @@ func SendEmail(email string, subject string, validationString string) {
     servername := smtpServer
     host, _, _ := net.SplitHostPort(servername)
     // If I have a short login (aka the login do not contain the domain name from the SMTP server)
-    shortName,_ := strings.Split(smtpAccount, "@")
+    shortName := strings.Split(smtpAccount, "@")
     var from mail.Address
     if ( len(shortName) > 1 ) {
-	from = mail.Address{"", smtpAccount}
-    } else
-	from = mail.Address{"", smtpAccount+"@"+host}
+      from = mail.Address{"", smtpAccount}
+    } else {
+      from = mail.Address{"", smtpAccount+"@"+host}
     }
     to   := mail.Address{"", email}
     subj := subject
