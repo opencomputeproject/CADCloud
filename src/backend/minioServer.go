@@ -544,13 +544,13 @@ func createMinIOServer(username string, URL string, accessToken string, secretTo
 
 		type minIOEntry struct {
 		        Username string
-		        Port string
+		        Ports string
 		}
 
 		var localEntry minIOEntry
 
 		localEntry.Username = username
-		localEntry.Port =  availablePort
+		localEntry.Ports =  availablePort
 
                 content, _ := json.Marshal(localEntry)
                 var CacheURI = os.Getenv("CACHE_URI")
