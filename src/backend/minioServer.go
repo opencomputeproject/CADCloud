@@ -196,6 +196,17 @@ func startMinIOServer(URI string, r *http.Request) {
 		                s := strconv.Itoa(realTCPPort)
 		                sCtrl := strconv.Itoa(realTCPPort+1000)
 				address := strings.Split(URI,":")
+				credentialsURI:=os.Getenv("CREDENTIALS_URI")
+				credentialsPort:=os.Getenv("CREDENTIALS_TCPPORT")
+				result:=base.HTTPGetRequest("http://"+credentialsURI+credentialsPort+"/user/"+minIOArray[i].Username+"/userGetInternalInfo")
+				// We have to unmarshall the result
+                                var userPtr *base.User
+                                userPtr=new(base.User)
+                                json.Unmarshal([]byte(result),userPtr)
+
+                                os.Setenv("MINIO_ACCESS_KEY", userPtr.TokenAuth)
+                                os.Setenv("MINIO_SECRET_KEY", userPtr.TokenSecret)
+                                os.Setenv("MINIO_BROWSER", "off")
 				command := "minio server --address "+address[0]+":"+ s +" "+ minIORoot + "/" + minIOArray[i].Username
 				commandCtrl := "minio server --address "+address[0]+":"+ sCtrl +" "+ minIORoot + "ctrl/" + minIOArray[i].Username
 
@@ -238,15 +249,6 @@ func startMinIOServer(URI string, r *http.Request) {
 				// We must check if the ctrl bucket is properly created or not
 				// if not we must create it
 
-				// To initiate such request we must get the Token and SecretToken for the user name minIOArray[i].Username
-			        credentialsURI:=os.Getenv("CREDENTIALS_URI")
-			        credentialsPort:=os.Getenv("CREDENTIALS_TCPPORT")
-
-				result:=base.HTTPGetRequest("http://"+credentialsURI+credentialsPort+"/user/"+minIOArray[i].Username+"/userGetInternalInfo")
-			        // We have to unmarshall the result
-			        var userPtr *base.User
-			        userPtr=new(base.User)
-			        json.Unmarshal([]byte(result),userPtr)
 				fullPath := "/ctrl/"
 				method := "GET"
 
@@ -682,6 +684,9 @@ func main() {
     var minIOURI = os.Getenv("MINIO_URI")
     var minIOTCPPORT = os.Getenv("MINIO_TCPPORT")
 
+    if _, err := os.Stat(minIORoot); os.IsNotExist(err) {
+    	os.MkdirAll(minIORoot, os.ModePerm)
+    }
     // We have to start configured server and report there existence to the 
     // main caching server
 
