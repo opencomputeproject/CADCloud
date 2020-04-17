@@ -30,7 +30,7 @@ $(document).click(function(ee) {
 	}
 });
 
-function addCard(cardImage, cardAvatar, xeoglCode, Date, Name, Revisions, Owner) {
+function addCard(cardImage, cardAvatar, xeoglUrl, Date, Name, Revisions, Owner) {
 
 	
 	card = '<div id="myCard' + Date+'-'+Owner+'-'+Name+'-'+Revisions+
@@ -52,12 +52,23 @@ function addCard(cardImage, cardAvatar, xeoglCode, Date, Name, Revisions, Owner)
 		e.stopPropagation();
 		var originalScrollTo = window.scrollTo;
 		window.scrollTo = function () {};
-		$('#Player').attr("srcdoc",xeoglCode);
-		$('#Player').addClass("animated fadeIn");
-		$('#myplayer').css("display","");
-		playerdisplayed = 1;
-		window.scrollTo = originalScrollTo;
-		clickcount=clickcount+1;
+		// That stuff shall be loaded when the button is pressed
+		// Depending on the model the player code is complex due to the number
+		// of part and the associated tree
+
+		$.ajax({
+			url: xeoglUrl,
+                        type: 'GET',
+                        success: function(response) {
+	                        	xeoglCode = response;
+					$('#Player').attr("srcdoc",xeoglCode);
+					$('#Player').addClass("animated fadeIn");
+			                $('#myplayer').css("display","");
+			                playerdisplayed = 1;
+			                window.scrollTo = originalScrollTo;
+			                clickcount=clickcount+1;
+                        	}
+                        });
 	});
 
 	avatar='<div class="avatarProject-upload">'+
@@ -80,73 +91,63 @@ function setupHomePage() {
                 'id="myplayer" style="width:80%;margin:auto;display:none;"><iframe class="embed-responsive-item" id="Player">'+
                 '</iframe></div>';
         $('#player').append(player);
-	jQuery.ajaxSetup({async:false});
-	var jqxhr = $.ajax({
+//	jQuery.ajaxSetup({async:false});
+        var jqxhr = $.ajax({
                type: "GET",
                url: Url,
                success: function postreturn(data) {
-			// We are getting Json content which is a list of
-			// public project
-			var obj = JSON.parse( data );
+                        // We are getting Json content which is a list of
+                        // public project
+                        var obj = JSON.parse( data );
                         var myarray = Object.keys(obj);
+                        var index =[];
                         for (let i = 0; i  < obj["Entries"].length; i++) {
-				var currentRevision = 0;
-				var index = 0;
-				for ( let l = 0 ; l < obj["Entries"][i]["Revisions"].length ; l++ ) {
-					if ( parseInt(obj["Entries"][i]["Revisions"][l]) > currentRevision ) {
-						currentRevision = obj["Entries"][i]["Revisions"][l];
-						index = l ;
-					}
-				}
-	 			// We need to display the project magnet
-				// the code is going to be seating into #projects div
-				var magnetUrl = '/projects/getMagnet/'+obj["Entries"][i]["Date"][index]+'/'+
-						obj["Entries"][i]["Owner"]+'/'+obj["Entries"][i]["Name"]+'/'+
-						obj["Entries"][i]["Revisions"][index];
-
-				var magnetAvatar = '/projects/getAvatar/'+obj["Entries"][i]["Date"][index]+'/'+
+                                var currentRevision = 0;
+                                index[i] = 0;
+                                for ( let l = 0 ; l < obj["Entries"][i]["Revisions"].length ; l++ ) {
+                                        if ( parseInt(obj["Entries"][i]["Revisions"][l]) > currentRevision ) {
+                                                currentRevision = obj["Entries"][i]["Revisions"][l];
+                                                index[i] = l ;
+                                        }
+                                }
+                                // We need to display the project magnet
+                                // the code is going to be seating into #projects div
+                                var magnetUrl = '/projects/getMagnet/'+obj["Entries"][i]["Date"][index[i]]+'/'+
                                                 obj["Entries"][i]["Owner"]+'/'+obj["Entries"][i]["Name"]+'/'+
-                                                obj["Entries"][i]["Revisions"][index];
+                                                obj["Entries"][i]["Revisions"][index[i]];
 
-				var playerCode = '/projects/getPlayerCode/'+obj["Entries"][i]["Date"][index]+'/'+
-						obj["Entries"][i]["Owner"]+'/'+obj["Entries"][i]["Name"]+'/'+
-						obj["Entries"][i]["Revisions"][index];
+                                $.ajax({
+                                       url: window.location.origin + magnetUrl,
+                                       type: 'GET',
+                                       success: function(response) {
+                                                        var cardImage="";
+                                                        cardImage = response;
+                                                        var magnetAvatar = '/projects/getAvatar/'+obj["Entries"][i]["Date"][index[i]]+'/'+
+                                                                                obj["Entries"][i]["Owner"]+'/'+obj["Entries"][i]["Name"]+'/'+
+                                                                                obj["Entries"][i]["Revisions"][index[i]];
+                                                        $.ajax({
+                                                               url: window.location.origin + magnetAvatar,
+                                                               type: 'GET',
+                                                               success: function(response) {
+                                                                        var cardAvatar="";
+                                                                        cardAvatar = response;
+                                                                        var playerCode = '/projects/getPlayerCode/'+obj["Entries"][i]["Date"][index[i]]+'/'+
+                                                                                obj["Entries"][i]["Owner"]+'/'+obj["Entries"][i]["Name"]+'/'+
+                                                                                obj["Entries"][i]["Revisions"][index[i]];
+                                                                        addCard(cardImage, cardAvatar, window.location.origin + playerCode ,
+                                                                                obj["Entries"][i]["Date"][index[i]],
+                                                                                obj["Entries"][i]["Name"], obj["Entries"][i]["Revisions"][index[i]],
+                                                                                obj["Entries"][i]["Owner"]);
+                                                                        }
+                                                        });
+                                                }
+                                });
 
-				var cardImage="";
-				var cardAvatar="";
-				var xeoglCode="";
-
-
-				$.ajax({
-				       url: window.location.origin + magnetUrl,
-				       type: 'GET',
-				       success: function(response) {
-				       			cardImage = response;
-							$.ajax({
-			                                       url: window.location.origin + magnetAvatar,
-			                                       type: 'GET',
-			                                       success: function(response) {
-		                                                        cardAvatar = response;
-									$.ajax({
-					                                       url: window.location.origin + playerCode,
-					                                       type: 'GET',
-					                                       success: function(response) {
-				                                                        xeoglCode = response;
-											addCard(cardImage, cardAvatar, xeoglCode, obj["Entries"][i]["Date"][index],
-												obj["Entries"][i]["Name"], obj["Entries"][i]["Revisions"][index],
-												obj["Entries"][i]["Owner"]);
-						                                       }
-						                                });
-			                                       }
-		                                	});
-       				       		}
-				});
-				
                         }
-			// $('#projects').html(data);
+                        // $('#projects').html(data);
                       }
         });
-	jQuery.ajaxSetup({async:true});
+//	jQuery.ajaxSetup({async:true});
 }
 var clickcount=0;
 var playerdisplayed=0;
