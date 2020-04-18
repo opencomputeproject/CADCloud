@@ -214,8 +214,19 @@ func addFilesEntry(Key string, BucketName string, content string) (string) {
 			// we must update the file entry structure
 			var tmpFileList []Files
 			var j int
+			var recovery int
 			json.Unmarshal([]byte(content),&tmpFileList)
-
+			// We need to suppress empty files
+			for j,_ = range tmpFileList {
+                                if ( tmpFileList[j].File == "" ) {
+                                        emptyIndexes = append(emptyIndexes, j)
+                                }
+                        }
+			recovery = 0
+                        for j,_ = range emptyIndexes {
+                                tmpFileList=append(tmpFileList[:(emptyIndexes[j]-recovery)], tmpFileList[(emptyIndexes[j]-recovery)+1:]...)
+                                recovery = recovery + 1
+                        }
 			// Is there soon a BucketName entry ? If not we must append it
 			for j,_ = range cache[i].Buckets {
 				if ( cache[i].Buckets[j].Name == BucketName ) {
