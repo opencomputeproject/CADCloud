@@ -213,6 +213,7 @@ func addFilesEntry(Key string, BucketName string, content string) (string) {
                 if ( entry.Key == Key ) {
 			// we must update the file entry structure
 			var tmpFileList []Files
+			var emptyIndexes []int
 			var j int
 			var recovery int
 			json.Unmarshal([]byte(content),&tmpFileList)
