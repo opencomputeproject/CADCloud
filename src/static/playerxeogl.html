@@ -268,8 +268,11 @@
 		tree.css("display","");
 	        }
 	 });
-
-
+	// Need to put the Canvas background transparent to have nice FreeCAD background
+        var scene = new xeogl.Scene({
+        	canvas: "myCanvas",
+        	transparent: true
+    	});
 
 	    var Model = new xeogl.Group({
 	    aabbVisible: true,
