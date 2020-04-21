@@ -89,7 +89,7 @@
         margin:0;
         padding:0 1em;
         line-height:2em;
-        color:#fff;
+        color:#000;
         font-weight:700;
         position:relative
     }
@@ -105,7 +105,7 @@
         left:0
     }
     .tree ul li:last-child:before {
-        background:#000;
+        background:transparent;
         height:auto;
         top:1em;
         bottom:0
@@ -191,7 +191,7 @@
                                                                         $('#'+leaf.attr('id')).css("color", "red");
                                                                 } else {
                                                                         scene.models[name].meshes[id].visible = true;
-                                                                        $('#'+leaf.attr('id')).css("color", "white");
+                                                                        $('#'+leaf.attr('id')).css("color", "black");
                                                                 }
                                                            }
 						}
@@ -205,7 +205,7 @@
 				                                        $('#'+leaf.attr('id')).css("color", "red");
 								} else {
 									scene.models[name].meshes[id].visible = true;
-				                                        $('#'+leaf.attr('id')).css("color", "white");
+				                                        $('#'+leaf.attr('id')).css("color", "black");
 								}
 	                                                   }
 	                                                }
