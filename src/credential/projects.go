@@ -47,6 +47,7 @@ import (
 var ProjectTMP = os.Getenv("PROJECT_TEMP")
 var ProjectURI = os.Getenv("PROJECT_URI")
 var ProjectMinIOPort = os.Getenv("PROJECT_MINIO_TCPPORT")
+var staticAssetsDir = os.Getenv("STATIC_ASSETS_DIR")
 
 var file sync.RWMutex
 
@@ -197,9 +198,20 @@ func moveEntry(r *http.Request, content string) {
 
 }
 
+type projectValue struct {
+	Owner string
+	Name string
+	Private int
+	Date []string
+	Revisions []string
+}
+
+var projectList []projectValue
+
 func getList(username string) string{
 
 	// The default is to return a project list
+	var projectList []projectValue
 
         fullPath := "/public/"
 
@@ -230,16 +242,6 @@ func getList(username string) string{
         _ = xml.NewDecoder(in).Decode(&XMLcontents)
 	var output string
 
-	type projectEntry struct {
-		Owner string
-		Name string
-		Private int
-		Date []string
-		Revisions []string
-	}
-
-	var projectList []projectEntry
-	
 	// WARNING: THIS REQUEST CAN BE EXTREMELY SLOW WHEN PROJECTS NUMBER WILL INCREASE
 
 
@@ -267,7 +269,7 @@ func getList(username string) string{
 					}
 				}
 				if  index == -1 {
-					var newprojectEntry projectEntry
+					var newprojectEntry projectValue
 					newprojectEntry.Date = append(newprojectEntry.Date, entry[0])
 					newprojectEntry.Owner = entry[1]
 					newprojectEntry.Name = realName
@@ -348,7 +350,7 @@ func getList(username string) string{
 	                                }
 	                        }
 	                        if  index == -1 {
-	                                var newprojectEntry projectEntry
+	                                var newprojectEntry projectValue
 	                                newprojectEntry.Date = append(newprojectEntry.Date, entry[0])
 	                                newprojectEntry.Owner = entry[1]
 	                                newprojectEntry.Name = realName
@@ -579,7 +581,7 @@ func getCode(indexes []int, tree Object, labels []Translate) (string) {
 	return code
 }
 
-func getPlayerCode(w http.ResponseWriter, path string, private int) {
+func getPlayerCode(w http.ResponseWriter, path string, Host string, private int) {
 
         contents := getJSONEntry(path, private)
 
@@ -602,6 +604,9 @@ func getPlayerCode(w http.ResponseWriter, path string, private int) {
         response, _ := client.Do(req)
         defer response.Body.Close()
         content, _ := ioutil.ReadAll(response.Body)
+
+        content = []byte(strings.Replace(string(content),"js/xeogl.js","https://"+Host+"/js/xeogl.js",1))
+        content = []byte(strings.Replace(string(content),"js/OBJModel.js","https://"+Host+"/js/OBJModel.js",1))
 
 	// We must know how many parts stands into the part ... based on that we can generate the code properly
 
@@ -792,6 +797,111 @@ func getPlayerCode(w http.ResponseWriter, path string, private int) {
 
 }
 
+func projectPage(w http.ResponseWriter, path string) {
+	var output string
+	var returnData string
+	// We must return the homepage code as to setup the initial environment
+	// We have to kick the javascript code into it
+	
+        a, _ := ioutil.ReadFile(staticAssetsDir+"projects.html") // just pass the file name
+	// the SCRIPT keyword is used to insert the javascript code
+	// We must just update into the core parameters
+        b, _ := ioutil.ReadFile(staticAssetsDir+"js/projectsCardFull.js") // just pass the file name
+
+	returnData = string(a)
+	returnData = strings.Replace(returnData, "SCRIPT", string(b), 1)
+
+
+	// We must add at the end of the b content the call to the function using the parameter which 
+	// we received from the URL	
+	keyWords := strings.Split(path, "/")
+	date := keyWords[3]
+	account := keyWords[4]
+	bucket := keyWords[5]
+	revision := keyWords[6]
+	fmt.Printf(revision)
+	contents:=getJSONEntry(path,0)
+        // I must put the content into the right structure
+        var dataFreeCAD freecadEntry
+	var projectList []projectValue
+        _ = json.Unmarshal([]byte(contents), &dataFreeCAD)
+
+	// I got the access token
+	// We must determine the revision from the current project
+	// This can be done by listing the bucketname into the ctrl part of the user account
+
+	var myprojectEntry projectValue
+	myprojectEntry.Owner = account
+	myprojectEntry.Name = bucket
+	myprojectEntry.Private = 0
+	myprojectEntry.Date = append(myprojectEntry.Date, date)
+        myprojectEntry.Revisions = append(myprojectEntry.Revisions, "0")
+	
+	//  Revisions []string are missing currently
+        // The default is to return a project list
+
+/*       q := url.Values{}
+       q.Add("list-type", "2")
+       q.Add("max-keys", "1000")
+
+
+        // That is a new request so let's do it
+        var response *http.Response
+
+        response,_ = base.Request(method, "http://"+ProjectURI+ProjectMinIOPort+fullPath, fullPath, "application/xml", nil, q.Encode(), data.Key, data.SecretToken)
+
+*/
+
+        fullPath := "/"
+
+        method := "GET"
+        realPort,_ := strconv.Atoi(dataFreeCAD.Port)
+        realPort = realPort + 1000 + base.MinIOServerBasePort
+
+        response, _ := base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPath, fullPath, "application/xml", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
+
+        defer response.Body.Close()
+        mycontent, _ := ioutil.ReadAll(response.Body)
+	fmt.Printf(string(mycontent))
+
+        projectList = append(projectList, myprojectEntry)
+
+        output = "{ \"Entries\" : ["
+        for i := 0 ; i <= len(projectList) ; i++ {
+                output = output + "{"
+                output = output + "\"Name\" : \""+ projectList[i].Name +"\" , "
+                output = output + "\"Owner\" : \""+ projectList[i].Owner +"\" , "
+                output = output + "\"Private\" : \""+ strconv.Itoa(projectList[i].Private) +"\" , "
+                output = output + "\"Date\" : ["
+
+                for j := 0 ; j < len(projectList[i].Date) ; j++ {
+                        output = output + "\""+ projectList[i].Date[j]+"\""
+                        if ( j < len(projectList[i].Date) - 1 ) {
+                                output = output + ","
+                        }
+                }
+
+                output = output + "], "
+                output = output + "\"Revisions\" : "
+
+                output = output + "["
+                for j := 0 ; j < len(projectList[i].Revisions) ; j++ {
+                        output = output + "\""+ projectList[i].Revisions[j]+"\""
+                        if ( j < len(projectList[i].Revisions) - 1 ) {
+                                output = output + ","
+                        }
+                }
+                output = output + "]"
+                output = output + "}"
+                if ( i < len(projectList)-1 ) {
+                        output = output + ","
+                }
+        }
+        output = output +"]}"
+        returnData = strings.Replace( returnData, "PARAMETERS", "'https://localhost:4711/"+"'"+","+"'"+output+"'", -1)
+	w.Write([]byte(output))
+
+}
 
 // getModel is used from xeogl OBJ loader, so if it is not connected it can't get access to private data
 
@@ -848,7 +958,7 @@ func getModel(w http.ResponseWriter, path string, private int) {
 }
 
 func userCallback(w http.ResponseWriter, r *http.Request) {
-	command := [...]string{ "getList", "getMagnet", "getAvatar", "getPlayerCode", "getModel" }
+	command := [...]string{ "getList", "getMagnet", "getAvatar", "getPlayerCode", "getModel", "projectPage" }
 
 	words := strings.Split(r.URL.Path, "/")
 
@@ -896,7 +1006,7 @@ func userCallback(w http.ResponseWriter, r *http.Request) {
                                         case "getAvatar":
                                                 getAvatar(w,path,Private)
                                         case "getPlayerCode":
-                                                getPlayerCode(w,path,Private)
+                                                getPlayerCode(w,path,r.Host,Private)
                                         case "getModel":
                                                 getModel(w,path,Private)
                                 }
@@ -913,15 +1023,17 @@ func userCallback(w http.ResponseWriter, r *http.Request) {
 	                                                getAvatar(w,r.URL.Path,0)
 							return
 	                                        case "getPlayerCode":
-	                                                getPlayerCode(w,r.URL.Path,0)
+	                                                getPlayerCode(w,r.URL.Path,r.Host,0)
 							return
 	                                        case "getModel":
 	                                                getModel(w,r.URL.Path,0)
 							return
+						case "projectPage":
+							projectPage(w,r.URL.Path)
+							return
 	                                }
 					w.Write(([]byte)("Error access denierd"))
 				}
-			
 			}
                 default:
         }

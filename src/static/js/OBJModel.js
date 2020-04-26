@@ -955,42 +955,39 @@
     function loadFile(url, ok, err) {
 
 	// If we are logged in 
-	if ( typeof window.parent.mylocalStorage['accessKey'] !== 'undefined' )
+	if ( typeof window.parent.mylocalStorage !== 'undefined' )
 	{
+		if ( typeof window.parent.mylocalStorage['accessKey'] !== 'undefined' )
+		{
 
-	window.parent.BuildSignedAuth(url, 'GET' , "application/octet-stream", function(authString){
-		console.log("KICKING GET");
-		console.log(authString['signedString']);
-		console.log(window.parent.mylocalStorage['accessKey']);
-		console.log(url);
-                window.parent.$.ajax({
-                        headers: {
-                                "Authorization": "JYP " + window.parent.mylocalStorage['accessKey'] + ':' + authString['signedString'],
-                                "Content-Type" : "application/octet-stream",
-                                "myDate" : authString['formattedDate']
-                        },
-                        url: url,
-                        type: 'GET',
-                        success: function(response) {
-				// MTL files are currently buggy :(
-				if ( url.substr(url.length - 1) == "l" ) {
-					response = "";
-					console.log("MTL FILE");
+			window.parent.BuildSignedAuth(url, 'GET' , "application/octet-stream", function(authString){
+	                window.parent.$.ajax({
+	                        headers: {
+	                                "Authorization": "JYP " + window.parent.mylocalStorage['accessKey'] + ':' + authString['signedString'],
+	                                "Content-Type" : "application/octet-stream",
+	                                "myDate" : authString['formattedDate']
+	                        },
+	                        url: url,
+	                        type: 'GET',
+	                        success: function(response) {
+					// MTL files are currently buggy :(
+					if ( url.substr(url.length - 1) == "l" ) {
+						response = "";
+					}
+					if ( ok ) {
+						ok(response);
+					}
+				},
+				error: function(event) {
+					if (err) {
+						err(event);
+					}
 				}
-				if ( ok ) {
-					ok(response);
-				}
-			},
-			error: function(event) {
-				if (err) {
-					err(event);
-				}
-			}
-                });
-        });
-	return
+	                	});
+	        	});
+		return
+		}
 	}
-
 
 
 

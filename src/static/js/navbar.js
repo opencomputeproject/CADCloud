@@ -35,6 +35,7 @@ $('body').on('mouseover mouseout', '.dropdown', function(e) {
 
 function loginBtn() {
 $('#loginNavbar').on('click', function(e) {
+	if ( typeof(mylocalStorage) !== 'undefined' ) 
 	if (( "string" === typeof(mylocalStorage['secretKey']) ) & ( "string" === typeof(mylocalStorage['accessKey']) ))
 	{
 		disconnect();
@@ -65,6 +66,7 @@ $('#MyProjects').on('click', function(e) {
 });
 	// We must check if we are logged in or not ?
 	// and replace the button text
+	if ( typeof(mylocalStorage) !== 'undefined' )
 	if (( "string" === typeof(mylocalStorage['secretKey']) ) & ( "string" === typeof(mylocalStorage['accessKey']) ))
 	{
 	        // we must change the login button by a Disconnect button
