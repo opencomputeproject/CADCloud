@@ -48,7 +48,7 @@ function addCard(cardImage, xeoglCode, Date, Name, Revision, Owner, Revisions, D
 	cardPrivacy[Date+'-'+Owner+'-'+Name] = Private;
 
         card = card + '	<label class="custom-control-label" for="customSwitch-'+Date+'-'+Owner+'-'+Name+'-'+Revision+'">Make project Public</label>'+
-        	'</div></div>'+
+        	'</div></div>Project Links: <div id="PLink"></div>'+
         	'</form>';
 
 	// Let's handle the revision and display them through a slider. 
@@ -79,6 +79,10 @@ function addCard(cardImage, xeoglCode, Date, Name, Revision, Owner, Revisions, D
 	if ( Revisions.length > 1 ) {
 		$('#col1').append(slider);
 	}
+
+	// vejmarie Let's update the URL link
+	$('#PLink').html('Direct Link access: '+window.location.protocol+'//'+window.location.host+'/projects/projectPage/'+Date+'/'+Owner+'/'+Name+'/'+Revision+'<BR>'+
+                         'IFrame 3D player  : '+window.location.protocol+'//'+window.location.host+'/projects/projectPlayer/'+Date+'/'+Owner+'/'+Name+'/'+Revision);
 
 	$('#customSwitch-'+Date+'-'+Owner+'-'+Name+'-'+Revision).on("change", function() {
 		if ( $('#customSwitch-'+Date+'-'+Owner+'-'+Name+'-'+Revision).is(':checked') ) {
