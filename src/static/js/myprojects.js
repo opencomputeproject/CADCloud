@@ -81,8 +81,8 @@ function addCard(cardImage, xeoglCode, Date, Name, Revision, Owner, Revisions, D
 	}
 
 	// vejmarie Let's update the URL link
-	$('#PLink').html('Direct Link access: '+window.location+'projects/projectPage/'+Date+'/'+Owner+'/'+Name+'/'+Revision+'<BR>'+
-                         'IFrame 3D player  : '+window.location+'projects/projectPlayer/'+Date+'/'+Owner+'/'+Name+'/'+Revision);
+	$('#PLink').html('Direct Link access: '+window.location.protocol+'://'+window.location.host+'/projects/projectPage/'+Date+'/'+Owner+'/'+Name+'/'+Revision+'<BR>'+
+                         'IFrame 3D player  : '+window.location.protocol+'://'+window.location.host+'/projects/projectPlayer/'+Date+'/'+Owner+'/'+Name+'/'+Revision);
 
 	$('#customSwitch-'+Date+'-'+Owner+'-'+Name+'-'+Revision).on("change", function() {
 		if ( $('#customSwitch-'+Date+'-'+Owner+'-'+Name+'-'+Revision).is(':checked') ) {
