@@ -958,7 +958,7 @@ func getModel(w http.ResponseWriter, path string, private int) {
 }
 
 func userCallback(w http.ResponseWriter, r *http.Request) {
-	command := [...]string{ "getList", "getMagnet", "getAvatar", "getPlayerCode", "getModel", "projectPage" }
+	command := [...]string{ "getList", "getMagnet", "getAvatar", "getPlayerCode", "getModel", "projectPage", "projectPlayer" }
 
 	words := strings.Split(r.URL.Path, "/")
 
@@ -1031,6 +1031,15 @@ func userCallback(w http.ResponseWriter, r *http.Request) {
 						case "projectPage":
 							projectPage(w,r.URL.Path, r.Host)
 							return
+                                                case "projectPlayer":
+                                                        keyWords := strings.Split(r.URL.Path, "/")
+                                                        date := keyWords[3]
+                                                        account := keyWords[4]
+                                                        bucket := keyWords[5]
+                                                        revision := keyWords[6]
+                                                        getPlayerCode(w,"/projects/getPlayerCode/"+date+"/"+account+"/"+
+                                                        bucket+"/"+revision,r.Host,0)
+                                                        return
 	                                }
 					w.Write(([]byte)("Error access denierd"))
 				}
