@@ -797,7 +797,7 @@ func getPlayerCode(w http.ResponseWriter, path string, Host string, private int)
 
 }
 
-func projectPage(w http.ResponseWriter, path string) {
+func projectPage(w http.ResponseWriter, path string, Host string) {
 	var output string
 	var returnData string
 	// We must return the homepage code as to setup the initial environment
@@ -898,7 +898,7 @@ func projectPage(w http.ResponseWriter, path string) {
                 }
         }
         output = output +"]}"
-        returnData = strings.Replace( returnData, "PARAMETERS", "'https://localhost:4711/"+"'"+","+"'"+output+"'", -1)
+        returnData = strings.Replace( returnData, "PARAMETERS", "'https://"+Host+"/'"+","+"'"+output+"'", -1)
 	w.Write([]byte(returnData))
 
 }
@@ -1029,7 +1029,7 @@ func userCallback(w http.ResponseWriter, r *http.Request) {
 	                                                getModel(w,r.URL.Path,0)
 							return
 						case "projectPage":
-							projectPage(w,r.URL.Path)
+							projectPage(w,r.URL.Path, r.Host)
 							return
 	                                }
 					w.Write(([]byte)("Error access denierd"))
