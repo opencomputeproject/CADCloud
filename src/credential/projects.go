@@ -867,7 +867,7 @@ func projectPage(w http.ResponseWriter, path string, Host string) {
         projectList = append(projectList, myprojectEntry)
 
         output = "{ \"Entries\" : ["
-        for i := 0 ; i <= len(projectList) ; i++ {
+        for i := 0 ; i < len(projectList) ; i++ {
                 output = output + "{"
                 output = output + "\"Name\" : \""+ projectList[i].Name +"\" , "
                 output = output + "\"Owner\" : \""+ projectList[i].Owner +"\" , "
