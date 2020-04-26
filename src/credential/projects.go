@@ -899,7 +899,7 @@ func projectPage(w http.ResponseWriter, path string) {
         }
         output = output +"]}"
         returnData = strings.Replace( returnData, "PARAMETERS", "'https://localhost:4711/"+"'"+","+"'"+output+"'", -1)
-	w.Write([]byte(output))
+	w.Write([]byte(returnData))
 
 }
 
