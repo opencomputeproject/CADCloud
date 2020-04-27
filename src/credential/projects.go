@@ -835,7 +835,7 @@ func projectPage(w http.ResponseWriter, path string, Host string) {
 	myprojectEntry.Name = bucket
 	myprojectEntry.Private = 0
 	myprojectEntry.Date = append(myprojectEntry.Date, date)
-        myprojectEntry.Revisions = append(myprojectEntry.Revisions, "0")
+        myprojectEntry.Revisions = append(myprojectEntry.Revisions, string(revision))
 	
 	//  Revisions []string are missing currently
         // The default is to return a project list
