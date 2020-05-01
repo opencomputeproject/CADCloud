@@ -503,9 +503,14 @@ type linklist struct {
 	Entry   string  `xml:"value,attr"`
 }
 
+type localbool struct {
+        Value   bool    `xml:"value,attr"`
+}
+
 type Property struct {
 	Name    string   `xml:"name,attr"`
 	Strings  []localstring   `xml:"String"`
+        Bools  []localbool   `xml:"Bool"`
 	LinkList []linklist `xml:"LinkList>Link"`
 }
 
@@ -725,9 +730,11 @@ func getPlayerCode(w http.ResponseWriter, path string, Host string, private int)
 		objectIndex := []int { 0, 0 }
 
 		// We must keep only the stuff which have a property name label
+		// vejmarie
 		for i:= 0 ; i < len(contents.Objects) ; i++ {
 				hasLinks := 0
 				hasShape := 0
+				visibility := 0
 				var entry Translate
 				for j:=0 ; j < len(contents.Objects[i].Properties) ; j++  {
 					if ( contents.Objects[i].Properties[j].Name == "Label" ) {
@@ -743,10 +750,16 @@ func getPlayerCode(w http.ResponseWriter, path string, Host string, private int)
 					}
 					if ( contents.Objects[i].Properties[j].Name == "Shape" ) {
 						hasShape = 1
+						objectIndex[0] = i
 						entry.hasShape = 1
 					}
+					if ( contents.Objects[i].Properties[j].Name == "Visibility" ) {
+                                                if ( contents.Objects[i].Properties[j].Bools[0].Value == true ) {
+                                                        visibility = 1
+                                                }
+                                        }
 				}
-				if (  hasLinks == 0  && hasShape == 1) {
+				if (  hasLinks == 0  && hasShape == 1 && visibility == 1) {
 					parts = append(parts,entry)
 				}
 		}
@@ -773,7 +786,6 @@ func getPlayerCode(w http.ResponseWriter, path string, Host string, private int)
 			switched := 0
 			for i:=0 ; i < len(parts) ; i ++ {
 				if ( parts[i].Tag == 0 ) {
-					objectIndex[0] = i;
 					objectIndex[1] = 0;
 					switched = 1
 					code = code +  getCode(objectIndex, contents, parts) 
