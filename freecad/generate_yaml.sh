@@ -11,9 +11,13 @@ ext_list=`ls -ltd $(find /opt/local/FreeCAD-0.19/Ext) | awk '{ print $9}'`
 bin_list=`ls -ltd $(find /opt/local/FreeCAD-0.19/bin) | awk '{ print $9}'`
 data_list=`ls -ltd $(find /opt/local/FreeCAD-0.19/data) | awk '{ print $9}'`
 share_list=`ls -ltd $(find /opt/local/FreeCAD-0.19/share/Mod) | awk '{ print $9}'`
-python_list=`ls -ltd $(find /usr/lib/python2.7) | awk '{ print $9}'`
+python_pivy=`ls -ltd $(find /usr/local/lib/python3.5) | awk '{ print $9}'`
+python_list=`ls -ltd $(find /usr/lib/python3.5) | awk '{ print $9}'`
+python_list_2=`ls -ltd $(find /usr/lib/python3) | awk '{ print $9}'`
 pyside_list=`ls -ltd $(find  /usr/share/PySide/typesystems) | awk '{ print $9}'`
-python_binary=`ls /usr/bin/python /usr/bin/py*2.7`
+pyside2_list=`ls -ltd $(find  /usr/share/PySide2/typesystems) | awk '{ print $9}'`
+python_binary=`ls /usr/bin/python3 /usr/bin/python3.5 /usr/bin/py*3.5`
+syslib_qt=`ls -ltd $(find /usr/lib/x86_64-linux-gnu/qt5) | awk '{ print $9}'`
 syslib=`ls -ltd $(find /usr/lib/x86_64-linux-gnu/dri) | awk '{ print $9}'`
 syslib2=`ls -ltd $(find  /usr/lib/x86_64-linux-gnu/gtk-2.0) | awk '{ print $9}'`
 syslib3=`ls -ltd $(find  /usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0) | awk '{ print $9}'`
@@ -76,7 +80,7 @@ do
                 echo "      $i : $second_name" >> snapcraft.yaml
         fi
 done
-for i in $python_list $pyside_list
+for i in $python_list $python_list_2 $python_pivy $pyside_list $pyside2_list
 do
         if [ ! -d "$i" ]
         then
@@ -93,6 +97,14 @@ do
         fi
 done
 for i in  $syslib $syslib2 $syslib3 $syslib4 $syslib5 $syslib6 $syslib7 $syslib8 $syslib9 $syslib10 $syslib11 $fonts_list $icon_list $mime_list
+do
+        if [ ! -d "$i" ]
+        then
+                second_name=`echo $i | sed 's/\///'`
+                echo "      $i : $second_name" >> snapcraft.yaml
+        fi
+done
+for i in  $syslib_qt
 do
         if [ ! -d "$i" ]
         then
