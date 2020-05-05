@@ -8,10 +8,10 @@
 # Must add the autlogin script
 # Must add a lightdm start / reboot ?
 export LC_ALL=en_US.UTF-8
-FREECAD_GIT="https://github.com/vejmarie/FreeCAD"
-FREECAD_BRANCH="cloud"
+FREECAD_GIT="https://github.com/FreeCAD/FreeCAD.git"
+FREECAD_BRANCH="master"
 export CCACHE_DISABLE=1
-CPU=4
+CPU=2
 INIT_DISTRO=1
 
 function create_deb {
@@ -63,6 +63,8 @@ then
 		ubuntu_version=`lsb_release -a | grep -i codename | awk '{ print $2 }'`
 	        if [ "$ubuntu_version" == "xenial" ]
 	        then
+		add-apt-repository ppa:thopiekar/pyside-git
+		apt-get update
 		package_list="		doxygen                          \
                               		libboost1.58-dev                 \
                                		libboost-filesystem1.58-dev      \
@@ -87,10 +89,19 @@ then
                                		libxmuu1                         \
                                		pyside-tools                     \
                                		python-dev                       \
+					python3-dev			 \
+					python3-numpy			 \
                                		python-pyside                    \
+					libpyside2-dev			 \
+					python3-pyside2			 \
+					pyside2-tools			 \
+					libshiboken2-dev		 \
                                		python-matplotlib                \
                                		qt4-dev-tools                    \
                                		qt4-qmake                        \
+					libqt5webkit5-dev		\
+					libqt5svg5-dev			\
+					libqt5xmlpatterns5-dev		\
 			       		libqtwebkit-dev			\
                                		shiboken                         \
 			       		libcurl4-openssl-dev		\
@@ -142,6 +153,14 @@ EOF
 	sudo /etc/init.d/lightdm start &
 	fi 
 fi
+
+# Switch boost to the relevant python version
+rm /usr/lib/x86_64-linux-gnu/libboost_python.so
+ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python.so
+# This is to workaround a bug into the Path module
+cp /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py27.so
+
+
 # Building MED
 
 exist=`ls /tmp/deb/MED*deb`
@@ -188,12 +207,12 @@ fi
 exist=`ls /tmp/deb/OCC*deb`
 if [ "$exist" == "" ]
 then
-	wget "http://git.dev.opencascade.org/gitweb/?p=occt.git;a=snapshot;h=b00770133187b83761e651df50051b2fa3433858;sf=tgz"
-	mv "index.html?p=occt.git;a=snapshot;h=b00770133187b83761e651df50051b2fa3433858;sf=tgz" occt.tgz
+	wget "http://git.dev.opencascade.org/gitweb/?p=occt.git;a=snapshot;h=fd47711d682be943f0e0a13d1fb54911b0499c31;sf=tgz"
+	mv "index.html?p=occt.git;a=snapshot;h=fd47711d682be943f0e0a13d1fb54911b0499c31;sf=tgz" occt.tgz
 	gunzip occt.tgz
 	tar xf occt.tar
 	rm occt.tar
-	cd occt-b007701
+	cd occt-fd47711
 	grep -v vtkRenderingFreeTypeOpenGL src/TKIVtk/EXTERNLIB >& /tmp/EXTERNLIB
 	\cp /tmp/EXTERNLIB src/TKIVtk/EXTERNLIB
 	grep -v vtkRenderingFreeTypeOpenGL src/TKIVtkDraw/EXTERNLIB >& /tmp/EXTERNLIB
@@ -205,10 +224,10 @@ then
 	sudo make -j $CPU
 	sudo make install
 
-	create_deb OCCT 7.0 "vtk (>= 7.0), med (>= 3.10)"
+	create_deb OCCT 7.4 "vtk (>= 7.0), med (>= 3.10)"
 	cd ../..
-	rm -rf occt-b007701
-	rm -rf /tmp/OCCT-7.0/
+	rm -rf occt-fd47711
+	rm -rf /tmp/OCCT-7.4/
 fi
 
 # Building Netgen
@@ -231,6 +250,17 @@ fi
 # We have to build OpenSSL
 #building FreeCAD
 
+wget https://github.com/coin3d/pivy/archive/0.6.5.tar.gz
+gunzip 0.6.5.tar.gz
+tar xf 0.6.5.tar
+cd pivy-0.6.5/
+python3 setup_old.py build
+sudo python3 setup_old.py install
+cd ..
+rm -rf pivy-0.6.5 0.6.5.tar
+
+
+echo "CURRENT DIRECTORY"
 pwd
 git clone $FREECAD_GIT
 cd FreeCAD
@@ -241,7 +271,8 @@ git checkout -b $FREECAD_BRANCH origin/$FREECAD_BRANCH
 cd ..
 mkdir build
 cd build
-cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DBUILD_FEM=1 -DBUILD_FEM_VTK=1 -DBUILD_FEM_NETGEN=1 -DCMAKE_CXX_FLAGS="-DNETGEN_V5"
+# cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DBUILD_FEM_VTK=1 -DBUILD_FEM_NETGEN=1 -DCMAKE_CXX_FLAGS="-DNETGEN_V5"
+cmake ../FreeCAD -DBOOST_PYTHON_SUFFIX=35 -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
 make -j $CPU
 make -j 4 install
 create_deb FreeCAD 0.19 "netgen (>= 5.3.1), occt (>= 7.0), med (>= 3.10)"
@@ -258,6 +289,7 @@ cd deb
 dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
 cd ..
 
+pwd
 if [ "$ubuntu_version" == "xenial" ]
 then
 #Let's build the snap
@@ -266,7 +298,7 @@ then
 	export LANGUAGE="en_US.UTF-8"
 	mkdir snap
 	cd snap
-	cp -Rf $source_dir/* .
+	cp -Rf /vagrant/* .
         apt-get install -y snapcraft
 	./generate_yaml.sh
 	snapcraft
@@ -278,3 +310,5 @@ if [ -f "/tmp/freecad_0.19_amd64.snap" ]
 then
 	mv /tmp/freecad_0.19_amd64.snap $source_dir/Results
 fi
+
+# cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
