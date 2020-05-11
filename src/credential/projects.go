@@ -1073,7 +1073,7 @@ func userCallback(w http.ResponseWriter, r *http.Request) {
                                                 getPlayerCode(w,path,r.Host,Private)
                                         case "getModel":
                                                 getModel(w,path,Private)
-					ase "recomputeProject":
+					case "recomputeProject":
                                                 // The path is slightly different her
                                                 keyWords := strings.Split(r.URL.Path, "/")
                                                 keyWords = append(keyWords[4:])
