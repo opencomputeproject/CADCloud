@@ -35,6 +35,7 @@ function addCard(cardImage, xeoglCode, Date, Name, Revision, Owner, Revisions, D
 	card =	'<div id="player"><img class="embed-responsive embed-responsive-16by9 shadow-lg p-3 mb-5 bg-white rounded" id="myimage'+Date+'-'+Owner+'-'+Name+'-'+Revision+
 		'" src="" alt="Card image cap" style="margin-bottom:2rem; ">' + player + '<form class="form-inline">' +
 		'<div id="Btn'+Date+'-'+Owner+'-'+Name+'-'+Revision+'" class="btn btn-primary" style="margin-bottom:2rem;">3D View</div>' +
+		'<div id="BtnRecomputeProject'+Date+'-'+Owner+'-'+Name+'-'+Revision+'" class="btn btn-primary btn-warning" style="margin-bottom:2rem; margin-left:5px">Recompute Project</div>' +
 		'<div id="BtnDeleteRevision'+Date+'-'+Owner+'-'+Name+'-'+Revision+'" class="btn btn-primary btn-warning" style="margin-bottom:2rem; margin-left:5px">Delete Revision</div>' +
 		'<div id="BtnDeleteProject'+Date+'-'+Owner+'-'+Name+'-'+Revision+'" class="btn btn-primary btn-danger" style="margin-bottom:2rem; margin-left:5px;">Delete Project</div>' +
 		'<div class="custom-control custom-switch" style="position:absolute; right:0px; margin-top:-15px;">';
@@ -135,6 +136,36 @@ function addCard(cardImage, xeoglCode, Date, Name, Revision, Owner, Revisions, D
 
 
 	jQuery("#myimage"+Date+'-'+Owner+'-'+Name+'-'+Revision).attr('src', 'data:image/png;base64,' + cardImage);
+
+        $('#BtnRecomputeProject'+Date+'-'+Owner+'-'+Name+'-'+Revision).click( function(e) {
+                e.stopPropagation();
+                console.log('recompute project');
+                // We need to call back the project to request a recompute of the project
+                if ( $('#customSwitch-'+Date+'-'+Owner+'-'+Name+'-'+Revision).is(':checked') ) {
+                        // the project is public
+                        Url = '/projects/' + mylocalStorage['username'] + '/recomputeProject/public/'+Date+'/'+mylocalStorage['username']+'/'+Name+'/'+Revision;
+                } else {
+                        // The project is private
+                        Url = '/projects/' + mylocalStorage['username'] + '/recomputeProject/private/'+Date+'/'+mylocalStorage['username']+'/'+Name+'/'+Revision;
+                }
+                BuildSignedAuth(Url, 'GET' , "application/json", function(authString) {
+                    $.ajax({
+                    url: window.location.origin + Url,
+                    type: 'GET',
+                    headers: {
+                        "Authorization": "JYP " + mylocalStorage['accessKey'] + ':' + authString['signedString'],
+                        "Content-Type" : "application/json",
+                        "myDate" : authString['formattedDate']
+                     },
+                    contentType: 'application/json',
+                    success: function(response) {
+                            console.log(response);
+                   }
+                });
+             });
+
+        });
+
 
 	$('#Btn'+Date+'-'+Owner+'-'+Name+'-'+Revision).click( function(e) {
 		if ( $('#Btn'+Date+'-'+Owner+'-'+Name+'-'+Revision).text() == "3D View" ) {

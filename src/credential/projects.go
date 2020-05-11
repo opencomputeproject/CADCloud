@@ -915,6 +915,58 @@ func projectPage(w http.ResponseWriter, path string, Host string) {
 
 }
 
+
+func recomputeProject(w http.ResponseWriter, r *http.Request, path string, private int) {
+        // This function is recomputing a project
+        // based on the URL and ownership
+        // It is used if a model is buggy and a FreeCAD update has been performed
+        // We got the path to recompute, we shall have the user key and the secret key
+        words := strings.Fields(r.Header.Get("Authorization"))
+        if ( words[0] == "JYP" ) {
+                keys := strings.Split(words[1],":")
+                cacheURI := os.Getenv("CACHE_URI")
+                cacheTCPPORT := os.Getenv("CACHE_TCPPORT")
+                result:=base.HTTPGetRequest("http://"+cacheURI+cacheTCPPORT+"/user/"+keys[0]+"/getSecretKey")
+                datas := strings.Split(result," ")
+                secretKey := datas[0]
+                nickname := datas[1]
+                result=base.HTTPGetRequest("http://"+cacheURI+cacheTCPPORT+"/user/"+keys[0]+"/getEntry")
+                url, _ := url.Parse("http://"+result)
+                urlport := url.Port()
+                urlhost := url.Hostname()
+                // We shall have everything let's try to do it
+                FreeCAD_URI := os.Getenv("FREECAD_URI")
+                FreeCAD_TCPPORT := os.Getenv("FREECAD_TCPPORT")
+                type freecadEntry struct {
+                        Nickname string
+                        Key string
+                        SecretKey string
+                        URI string
+                        Port string
+                        Bucket string
+                        Revision string
+                }
+                var data freecadEntry
+                data.Nickname = nickname
+                data.Key = keys[0]
+                data.SecretKey = secretKey
+                data.URI = urlhost
+                // We need to substract the base port
+                // from the urlport
+                i, _ := strconv.Atoi(urlport)
+                i = i - base.MinIOServerBasePort
+
+                data.Port = strconv.Itoa(i)
+                keyWords := strings.Split(path, "/")
+                data.Bucket = keyWords[3]
+                data.Revision = keyWords[4]
+                content,_:=json.Marshal(data)
+                fmt.Printf("Data sent to FreeCAD %s\n", content)
+                base.HTTPPutRequest("http://"+FreeCAD_URI+FreeCAD_TCPPORT,content,"application/json")
+        }
+}
+
+
 // getModel is used from xeogl OBJ loader, so if it is not connected it can't get access to private data
 
 
@@ -1021,6 +1073,12 @@ func userCallback(w http.ResponseWriter, r *http.Request) {
                                                 getPlayerCode(w,path,r.Host,Private)
                                         case "getModel":
                                                 getModel(w,path,Private)
+					ase "recomputeProject":
+                                                // The path is slightly different her
+                                                keyWords := strings.Split(r.URL.Path, "/")
+                                                keyWords = append(keyWords[4:])
+                                                path := strings.Join(keyWords[:], "/")
+                                                recomputeProject(w,r, path,Private)
                                 }
 			} else {
 				if ( found == 1 ) {
