@@ -201,6 +201,28 @@ func projects(w http.ResponseWriter, r *http.Request) {
         projectURI := os.Getenv("PROJECT_URI")
         projectTCPPORT := os.Getenv("PROJECT_TCPPORT")
 
+        var Url = r.URL.Path
+        var command string
+        entries := strings.Split(strings.TrimSpace(Url[1:]), "/")
+
+        // The login is always accessible
+        if ( len(entries) > 2 ) {
+                command = entries[2]
+        } else {
+                if ( len(entries) > 1 ) {
+                        command = entries[1]
+                } else {
+                        w.Write([]byte("{\"Malformed request\"}\n"))
+                        return
+                }
+        }
+        if ( command == "recomputeProject" ) {
+                if ( ! checkAccess(w,r) ) {
+                        w.Write([]byte("Access recompute project denied\n"))
+                        return
+                }
+        }
+
         url, _ := url.Parse("http://"+projectURI+projectTCPPORT)
 
         // create the reverse proxy
