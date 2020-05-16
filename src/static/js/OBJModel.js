@@ -955,40 +955,41 @@
     function loadFile(url, ok, err) {
 
 	// If we are logged in 
-	if ( typeof window.parent.mylocalStorage !== 'undefined' )
-	{
-		if ( typeof window.parent.mylocalStorage['accessKey'] !== 'undefined' )
+	if (  window.location == window.parent.location ) {
+		if ( typeof window.parent.mylocalStorage !== 'undefined' )
 		{
+			if ( typeof window.parent.mylocalStorage['accessKey'] !== 'undefined' )
+			{
 
-			window.parent.BuildSignedAuth(url, 'GET' , "application/octet-stream", function(authString){
-	                window.parent.$.ajax({
-	                        headers: {
-	                                "Authorization": "JYP " + window.parent.mylocalStorage['accessKey'] + ':' + authString['signedString'],
-	                                "Content-Type" : "application/octet-stream",
-	                                "myDate" : authString['formattedDate']
-	                        },
-	                        url: url,
-	                        type: 'GET',
-	                        success: function(response) {
-					// MTL files are currently buggy :(
-					if ( url.substr(url.length - 1) == "l" ) {
-						response = "";
+				window.parent.BuildSignedAuth(url, 'GET' , "application/octet-stream", function(authString){
+		                window.parent.$.ajax({
+		                        headers: {
+		                                "Authorization": "JYP " + window.parent.mylocalStorage['accessKey'] + ':' + authString['signedString'],
+		                                "Content-Type" : "application/octet-stream",
+		                                "myDate" : authString['formattedDate']
+		                        },
+		                        url: url,
+		                        type: 'GET',
+		                        success: function(response) {
+						// MTL files are currently buggy :(
+						if ( url.substr(url.length - 1) == "l" ) {
+							response = "";
+						}
+						if ( ok ) {
+							ok(response);
+						}
+					},
+					error: function(event) {
+						if (err) {
+							err(event);
+						}
 					}
-					if ( ok ) {
-						ok(response);
-					}
-				},
-				error: function(event) {
-					if (err) {
-						err(event);
-					}
-				}
-	                	});
-	        	});
-		return
+		                	});
+		        	});
+			return
+			}
 		}
 	}
-
 
 
         var request = new XMLHttpRequest();
