@@ -203,7 +203,9 @@ function mainpage(){
 
 	if (( "string" !== typeof(mylocalStorage['secretKey']) ) & ( "string" !== typeof(mylocalStorage['accessKey']) ))
 	{
+		// The user is not logged in so we must offer the opportunity to create an account
 		$('#signup').css("display", "");
+		$('#initHomepage').css("display", "");
 	}
 
 	loadJS("js/projects.js");
