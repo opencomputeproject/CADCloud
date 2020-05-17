@@ -35,6 +35,7 @@ import (
     "io/ioutil"
     "bytes"
     "strconv"
+    "sync"
 )
 
 type cacheEntry struct {
@@ -44,9 +45,11 @@ type cacheEntry struct {
 	URI string
 	Port string
 	Buckets []bucket
+	entryMux sync.Mutex
 }
 
 var cache []cacheEntry
+var cacheMux sync.Mutex
 
 type bucket struct {
 	Name string
@@ -220,12 +223,16 @@ func addFilesEntry(Key string, BucketName string, content string) (string) {
 			// We need to suppress empty files
 			for j,_ = range tmpFileList {
                                 if ( tmpFileList[j].File == "" ) {
+					entry.entryMux.Lock()
                                         emptyIndexes = append(emptyIndexes, j)
+					entry.entryMux.Unlock()
                                 }
                         }
 			recovery = 0
                         for j,_ = range emptyIndexes {
+				entry.entryMux.Lock()
                                 tmpFileList=append(tmpFileList[:(emptyIndexes[j]-recovery)], tmpFileList[(emptyIndexes[j]-recovery)+1:]...)
+				entry.entryMux.Unlock()
                                 recovery = recovery + 1
                         }
 			// Is there soon a BucketName entry ? If not we must append it
@@ -237,10 +244,14 @@ func addFilesEntry(Key string, BucketName string, content string) (string) {
 			if ( j == len(cache[i].Buckets) ) {
 				var tmpBucket bucket
 				tmpBucket.Name = BucketName
+				entry.entryMux.Lock()
 				cache[i].Buckets = append(cache[i].Buckets, tmpBucket)
+				entry.entryMux.Unlock()
 			}
+			entry.entryMux.Lock()
 			cache[i].Buckets[j].FileEntry = cache[i].Buckets[j].FileEntry + 1
 			cache[i].Buckets[j].FileList = append(cache[i].Buckets[j].FileList, tmpFileList...)  
+			entry.entryMux.Unlock()
                 }
         }
         return ""
@@ -255,8 +266,10 @@ func deleteFilesEntry(Key string, BucketName string) (string) {
                 if ( entry.Key == Key ) {
                         for j,_ := range cache[i].Buckets {
                                 if ( cache[i].Buckets[j].Name == BucketName ) {
+					entry.entryMux.Lock()
 					cache[i].Buckets[j].FileList = nil
 					cache[i].Buckets[j].FileEntry = 0
+					entry.entryMux.Unlock()
 					return ""
 				}
 			}
@@ -267,8 +280,14 @@ func deleteFilesEntry(Key string, BucketName string) (string) {
 			newBucket.FileList = nil
 			newBucket.FileEntry = 0
 			newBucket.Revision=getnewRevision(cache[i], BucketName)
+
+			entry.entryMux.Lock()
+
 			cache[i].Buckets = append(cache[i].Buckets, newBucket)
 			createBucketRevision(cache[i],cache[i].Buckets[len(cache[i].Buckets)-1])
+
+			entry.entryMux.Unlock()
+
 			return ""
 		}
 	}
@@ -280,6 +299,7 @@ func deleteFile(Key string, BucketName string,content string) (string) {
 		if ( entry.Key == Key ) {
 			for j,_ := range cache[i].Buckets {
                                 if ( cache[i].Buckets[j].Name == BucketName ) {
+					cache[i].entryMux.Lock()
 					for k, _ := range cache[i].Buckets[j].FileList {
 						if ( cache[i].Buckets[j].FileList[k].File == content ) {
 							cache[i].Buckets[j].FileList[k] = cache[i].Buckets[j].FileList[len(cache[i].Buckets[j].FileList)-1]
@@ -322,6 +342,7 @@ func deleteFile(Key string, BucketName string,content string) (string) {
 			                                base.HTTPPutRequest("http://"+FreeCAD_URI+FreeCAD_TCPPORT,content,"application/json")
 						}
 					}
+					cache[i].entryMux.Unlock()
 				}
 			}
 		}
@@ -356,7 +377,9 @@ func createEntry(username string, content string, URI string) (int) {
 	u, _ := url.Parse("http://"+URI)
 	entry.URI=u.Hostname()
 	entry.Port=ptr.Ports
+	cacheMux.Lock()
 	cache = append(cache,entry)
+	cacheMux.Unlock()
 	return 1
 }
 
