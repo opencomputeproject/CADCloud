@@ -38,8 +38,8 @@ function addCard(cardImage, cardAvatar, xeoglUrl, Date, Name, Revisions, Owner) 
 			'<img class="card-img-top" id="myimage'+Date+'-'+Owner+'-'+Name+'-'+Revisions+'" src="" alt="Card image cap">' +
 			'<div id="myBody'+Date+'-'+Owner+'-'+Name+'-'+Revisions+'" class="card-body">' +
 				'<h5 class="card-title">'+ Name + ' Rev ' + Revisions +'</h5>' +
-				'<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card content.</p>' +
-				'<div id="cardBtn'+Date+'-'+Owner+'-'+Name+'-'+Revisions+'" class="btn btn-primary" >Go somewhere</div>' +
+				'<p class="card-text" id="cardTxt'+Date+'-'+Owner+'-'+Name+'-'+Revisions+'"></p>' +
+				'<div id="cardBtn'+Date+'-'+Owner+'-'+Name+'-'+Revisions+'" class="btn btn-primary" >3D Preview</div>' +
 			'</div>' +
 		'</div>';
 
@@ -78,7 +78,16 @@ function addCard(cardImage, cardAvatar, xeoglUrl, Date, Name, Revisions, Owner) 
 			'<div style="font-size: 0.5rem;font-weight:bold; text-decoration:underline">'+Owner+'</div>' +
 		'</div>'+
 	'</div>';
+        link='<div class="linkProject-upload">'+
+                '    <div id="linkPreview'+Date+'-'+Owner+'-'+Name+'-'+Revisions+'" style="">'+
+                '    <img src="/images/link.png" height="24" width="24">'+
+                '    </div>'+
+                '</div>';
+        $('#myBody'+Date+'-'+Owner+'-'+Name+'-'+Revisions).prepend(link);
 	$('#myBody'+Date+'-'+Owner+'-'+Name+'-'+Revisions).prepend(avatar);
+	$('#linkPreview'+Date+'-'+Owner+'-'+Name+'-'+Revisions).click(function(e) {
+                window.open(window.location.protocol + '//' + window.location.hostname + '/projects/projectPage/'+Date+'/'+Owner+'/'+Name+'/'+Revisions , '_blank');
+        });
 	jQuery("#imagePreview"+Date+'-'+Owner+'-'+Name+'-'+Revisions).css('background-image', 'url("data:image/png;base64,' + cardAvatar + '")');
 
 }
