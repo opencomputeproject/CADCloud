@@ -34,7 +34,7 @@ function loadHTML(filename){
 
 function loadJS(filename){
         jQuery.ajaxSetup({async:false});
-        jQuery.getScript(iwindow.location.protocol+"//"+window.location.host+"/"+filename, function(data, textStatus, jqxhr) {
+        jQuery.getScript(window.location.protocol+"//"+window.location.host+"/"+filename, function(data, textStatus, jqxhr) {
                 });
         jQuery.ajaxSetup({async:true});
 }
@@ -51,8 +51,8 @@ function loadCSS(filename){
 function ProjectCardFull(cardImage, cardAvatar, xeoglCode, Date, Name, Revision, Owner, Revisions) {
 
         clearDocument();
-        loadHTML(window.location.protocol+"//"+window.location.host+"/navbar.html");
-        loadJS(window.location.protocol+"//"+window.location.host+"/js/navbar.js");
+        loadHTML("navbar.html");
+        loadJS("js/navbar.js");
         navbarHover();
         loginBtn();
 
