@@ -857,6 +857,9 @@ func projectPage(w http.ResponseWriter, path string, Host string) {
 	bucket := keyWords[5]
 	revision := keyWords[6]
 	fmt.Printf(revision)
+
+	returnData = strings.Replace(returnData, "OGMETA", "https://"+Host+"/projects/getMagnetRaw/"+date+"/"+account+"/"+bucket+"/"+revision,1)
+
 	contents:=getJSONEntry(path,0)
         // I must put the content into the right structure
         var dataFreeCAD freecadEntry
