@@ -56,3 +56,11 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+
+.linkProject-upload {
+  width: 64px;
+  height: 64px;
+  position: absolute;
+  top: 160px;
+  left: 240px;
+}
