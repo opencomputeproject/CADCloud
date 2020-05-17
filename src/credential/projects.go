@@ -458,6 +458,31 @@ func getMagnet(w http.ResponseWriter, Path string, private int) {
 
 }
 
+func getMagnetRaw(w http.ResponseWriter, Path string, private int) {
+
+        contents := getJSONEntry(Path, private)
+        // I must put the content into the right structure
+        var dataFreeCAD freecadEntry
+        _ = json.Unmarshal([]byte(contents), &dataFreeCAD)
+
+        // We must get the picture !
+
+        fullPath := "/ctrl/"+dataFreeCAD.Bucket + "r" + dataFreeCAD.Revision + ".png"
+
+        method := "GET"
+        realPort,_ := strconv.Atoi(dataFreeCAD.Port)
+        realPort = realPort + 1000 + base.MinIOServerBasePort
+
+        response, _ := base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPath, fullPath, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
+
+
+
+        defer response.Body.Close()
+        content, _ := ioutil.ReadAll(response.Body)
+        w.Write([]byte((content)))
+
+}
+
 func getAvatar(w http.ResponseWriter, path string, private int) {
 
 	contents := getJSONEntry(path, private)
@@ -832,6 +857,9 @@ func projectPage(w http.ResponseWriter, path string, Host string) {
 	bucket := keyWords[5]
 	revision := keyWords[6]
 	fmt.Printf(revision)
+
+	returnData = strings.Replace(returnData, "OGMETA", "https://"+Host+"/projects/getMagnetRaw/"+date+"/"+account+"/"+bucket+"/"+revision,1)
+
 	contents:=getJSONEntry(path,0)
         // I must put the content into the right structure
         var dataFreeCAD freecadEntry
@@ -1022,7 +1050,7 @@ func getModel(w http.ResponseWriter, path string, private int) {
 }
 
 func userCallback(w http.ResponseWriter, r *http.Request) {
-	command := [...]string{ "getList", "getMagnet", "getAvatar", "getPlayerCode", "getModel", "projectPage", "projectPlayer" }
+	command := [...]string{ "getList", "getMagnet", "getMagnetRaw", "getAvatar", "getPlayerCode", "getModel", "projectPage", "projectPlayer" }
 
 	words := strings.Split(r.URL.Path, "/")
 
@@ -1067,6 +1095,8 @@ func userCallback(w http.ResponseWriter, r *http.Request) {
                                                 w.Write([]byte(getList(context[2])))
                                         case "getMagnet":
                                                 getMagnet(w,path,Private)
+					case "getMagnetRaw":
+                                                getMagnetRaw(w,path,Private)
                                         case "getAvatar":
                                                 getAvatar(w,path,Private)
                                         case "getPlayerCode":
@@ -1089,6 +1119,9 @@ func userCallback(w http.ResponseWriter, r *http.Request) {
 	                                        case "getMagnet":
 	                                                getMagnet(w,r.URL.Path,0)
 							return
+						case "getMagnetRaw":
+                                                        getMagnetRaw(w,r.URL.Path,0)
+                                                        return
 	                                        case "getAvatar":
 	                                                getAvatar(w,r.URL.Path,0)
 							return
