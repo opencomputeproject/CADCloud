@@ -26,7 +26,7 @@ function clearDocument(){
 
 function loadHTML(filename){
         jQuery.ajaxSetup({async:false});
-        jQuery.get(filename, function(data, status){
+        jQuery.get(window.location.protocol+"//"+window.location.host+"/"+filename, function(data, status){
                 $(document.body).append(data);
         });
         jQuery.ajaxSetup({async:true});
@@ -34,14 +34,14 @@ function loadHTML(filename){
 
 function loadJS(filename){
         jQuery.ajaxSetup({async:false});
-        jQuery.getScript(filename, function(data, textStatus, jqxhr) {
+        jQuery.getScript(iwindow.location.protocol+"//"+window.location.host+"/"+filename, function(data, textStatus, jqxhr) {
                 });
         jQuery.ajaxSetup({async:true});
 }
 
 function loadCSS(filename){
         jQuery.ajaxSetup({async:false});
-        jQuery.get(filename, function(data, status){
+        jQuery.get(window.location.protocol+"//"+window.location.host+"/"+filename, function(data, status){
         $("<style>").prop("type", "text/css").html(data).appendTo("head");
 //                $(document.body).append(data);
         });
@@ -222,6 +222,10 @@ var playerdisplayed=0;
 var keepplayer=0;
 playerdisplayed=0;
 clickcount=0;
+loadJS("js/app.js");
+loadJS("js/navbar.js");
+navbarHover();
+loginBtn();
 setupHomePage(PARAMETERS);
 
 
