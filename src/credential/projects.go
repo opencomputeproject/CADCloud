@@ -646,7 +646,7 @@ func getPlayerCode(w http.ResponseWriter, path string, Host string, private int)
         realPort,_ := strconv.Atoi(dataFreeCAD.Port)
         realPort = realPort + 1000 + base.MinIOServerBasePort
 	var err error
-	response, err = base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPath, fullPath, "application/octet-stream", nil, "", data.Key, data.SecretToken)
+	response, err = base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPath, fullPath, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
 
 
         defer response.Body.Close()
