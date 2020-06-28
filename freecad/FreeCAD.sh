@@ -290,6 +290,12 @@ dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz
 cd ..
 
 pwd
+mkdir $source_dir/Results
+mv /tmp/deb/*.deb $source_dir/Results
+dpkg-scanpackages $source_dir/. /dev/null > $source_dir/Release
+dpkg-scanpackages $source_dir/. /dev/null > $source_dir/Packages
+apt-get update
+
 if [ "$ubuntu_version" == "xenial" ]
 then
 #Let's build the snap
@@ -300,12 +306,10 @@ then
 	cd snap
 	cp -Rf /vagrant/* .
         apt-get install -y snapcraft
-	./generate_yaml.sh
+#	./generate_yaml.sh
 	snapcraft
 	mv freecad_0.19_amd64.snap /tmp
 fi
-mkdir $source_dir/Results
-mv /tmp/deb/*.deb $source_dir/Results
 if [ -f "/tmp/freecad_0.19_amd64.snap" ]
 then
 	mv /tmp/freecad_0.19_amd64.snap $source_dir/Results
