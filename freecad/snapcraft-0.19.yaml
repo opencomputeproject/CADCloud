@@ -1,6 +1,6 @@
 
 name: freecad
-version: 0.18
+version: 0.19
 summary: development version
 description: development version This version is far from being bug free but integrates the latest FreeCAD technologies
 parts:
@@ -89,8 +89,8 @@ parts:
     override-stage: |
       snapcraftctl stage
       sed -i -E \
-        "s|^Icon=(.*)|Icon=\${SNAP}/opt/local/FreeCAD-0.18/share/icons/hicolor/scalable/apps/org.freecadweb.FreeCAD.svg|g" \
-        opt/local/FreeCAD-0.18/share/applications/org.freecadweb.FreeCAD.desktop
+        "s|^Icon=(.*)|Icon=\${SNAP}/opt/local/FreeCAD-0.19/share/icons/hicolor/scalable/apps/org.freecadweb.FreeCAD.svg|g" \
+        opt/local/FreeCAD-0.19/share/applications/org.freecadweb.FreeCAD.desktop
     prime:
       - bin
       - etc
@@ -101,9 +101,9 @@ parts:
       - usr/libx86_64-linux-gnu/
       - usr/bin
       - usr/share
-      - -opt/local/FreeCAD-0.18/share/docs
-      - -opt/local/FreeCAD-0.18/share/doc
-      - -opt/local/FreeCAD-0.18/include
+      - -opt/local/FreeCAD-0.19/share/docs
+      - -opt/local/FreeCAD-0.19/share/doc
+      - -opt/local/FreeCAD-0.19/include
  pivy:
     plugin: python
     source: https://github.com/CADCloud/pivy.git
@@ -112,6 +112,6 @@ parts:
 apps:
  freecad:
   common-id: org.freecadweb.FreeCAD.desktop
-  desktop: opt/local/FreeCAD-0.18/share/applications/org.freecadweb.FreeCAD.desktop
+  desktop: opt/local/FreeCAD-0.19/share/applications/org.freecadweb.FreeCAD.desktop
   command: bin/launcher
   plugs: [ locale-control,x11,opengl,network-bind,home,unity7 ]

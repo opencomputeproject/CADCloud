@@ -13,6 +13,7 @@ FREECAD_BRANCH="master"
 export CCACHE_DISABLE=1
 CPU=2
 INIT_DISTRO=1
+export home_dir=`pwd`
 
 function create_deb {
 rm -rf /tmp/$1-$2
@@ -260,12 +261,14 @@ cd ..
 rm -rf pivy-0.6.5 0.6.5.tar
 
 
-echo "CURRENT DIRECTORY"
-pwd
 git clone $FREECAD_GIT
-git checkout tags/0.18.4 -b 0.18.4
 cd FreeCAD
-git checkout -b $FREECAD_BRANCH origin/$FREECAD_BRANCH
+git checkout tags/0.18.4 -b 0.18.4
+
+# We must apply the patch as to build on xenial with latest gcc/g++
+cp /vagrant/patches/0.18/0.18.patches .
+patch -p0 < 0.18.patches
+
 #cat cMake/FindOpenCasCade.cmake | sed 's/\/usr\/local\/share\/cmake\//\/opt\/local\/FreeCAD-0.18\/lib\/cmake/' > /tmp/FindOpenCasCade.cmake
 #cp /tmp/FindOpenCasCade.cmake cMake/FindOpenCasCade.cmake
 #cp cMake/FindOpenCasCade.cmake cMake/FindOPENCASCADE.cmake
