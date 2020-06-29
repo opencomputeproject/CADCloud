@@ -1,0 +1,117 @@
+
+name: freecad
+version: 0.18
+summary: development version
+description: development version This version is far from being bug free but integrates the latest FreeCAD technologies
+parts:
+ example-part:
+    plugin: copy
+    files:
+      bin/launcher : bin/launcher
+      fontconfig/fonts.conf : fontconfig/fonts.conf
+      etc/matplotlibrc : etc/matplotlibrc
+    stage-packages:
+      - netgen
+      - occt
+      - vtk
+      - med
+      - freecad
+      - doxygen
+      - libboost1.58-dev
+      - libboost-filesystem1.58-dev
+      - libboost-program-options1.58-dev
+      - libboost-python1.58-dev
+      - libboost-regex1.58-dev
+      - libboost-signals1.58-dev
+      - libboost-system1.58-dev
+      - libboost-thread1.58-dev
+      - libcoin80v5
+      - libcoin80-dev
+      - libqt5webkit5-dev
+      - libqt5svg5-dev
+      - libqt5xmlpatterns5-dev
+      - libqt5widgets5
+      - libqt5quickwidgets5
+      - libqt5multimediawidgets5
+      - libtcl8.5
+      - libtk8.5
+      - libsz2
+      - libwind0-heimdal
+      - python3-pyside2
+      - libshiboken-py3-2.0
+      - libsasl2-2
+      - librtmp1
+      - libroken18-heimdal
+      - libpython3.5
+      - libpython3.5-minimal
+      - libpyside2.0
+      - libldap-2.4-2
+      - libhx509-5-heimdal
+      - libkrb5-26-heimdal
+      - libheimntlm0-heimdal
+      - libheimbase1-heimdal
+      - libhcrypto4-heimdal
+      - libgssapi3-heimdal
+      - libcurl3-gnutls
+      - libcurl3
+      - libasn1-8-heimdal
+      - libaec0
+      - libhdf5-10
+      - libxerces-c3.1
+      - libfreetype6-dev
+      - libxt-dev
+      - libxmu-dev
+      - libxi-dev
+      - libgl1-mesa-dev
+      - libglu1-mesa-dev
+      - libfreeimage-dev
+      - libtbb-dev
+      - python3-numpy
+      - python3-matplotlib
+      - python3-six
+      - python3-pyparsing
+      - python3-setuptools-scm
+      - python3-cycler
+      - python3-dateutil
+      - python3-git
+      - python3-ply
+      - graphviz
+      - calculix-ccx
+      - libc-bin
+      - locales
+      - debconf
+      - ttf-bitstream-vera
+      - xfonts-base
+      - xfonts-encodings
+      - xfonts-utils
+      - xfonts-scalable
+      - fonts-dejavu-core
+    override-stage: |
+      snapcraftctl stage
+      sed -i -E \
+        "s|^Icon=(.*)|Icon=\${SNAP}/opt/local/FreeCAD-0.18/share/icons/hicolor/scalable/apps/org.freecadweb.FreeCAD.svg|g" \
+        opt/local/FreeCAD-0.18/share/applications/org.freecadweb.FreeCAD.desktop
+    prime:
+      - bin
+      - etc
+      - fontconfig
+      - opt
+      - lib
+      - usr/lib
+      - usr/libx86_64-linux-gnu/
+      - usr/bin
+      - usr/share
+      - -opt/local/FreeCAD-0.18/share/docs
+      - -opt/local/FreeCAD-0.18/share/doc
+      - -opt/local/FreeCAD-0.18/include
+ pivy:
+    plugin: python
+    source: https://github.com/CADCloud/pivy.git
+    python-version: python3
+
+apps:
+ freecad:
+  common-id: org.freecadweb.FreeCAD.desktop
+  desktop: opt/local/FreeCAD-0.18/share/applications/org.freecadweb.FreeCAD.desktop
+  command: bin/launcher
+  plugs: [ locale-control,x11,opengl,network-bind,home,unity7 ]
