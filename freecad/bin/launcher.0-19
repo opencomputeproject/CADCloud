@@ -23,7 +23,7 @@ export LANG=$LOC
 export LANGUAGE=${LANG%_*}
 export LIBGL_DRIVERS_PATH=$SNAP/usr/lib/x86_64-linux-gnu/dri
 export GTK_PATH=$SNAP/usr/lib/x86_64-linux-gnu/gtk-2.0/modules
-export LD_LIBRARY_PATH=$SNAP/usr/lib:$SNAP/usr/lib/x86_64-linux-gnu/gio/modules:$SNAP/usr/lib/x86_64-linux-gnu/gtk-2.0/modules:$SNAP/opt/local/FreeCAD-0.18/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$SNAP/usr/lib:$SNAP/usr/lib/x86_64-linux-gnu/gio/modules:$SNAP/usr/lib/x86_64-linux-gnu/gtk-2.0/modules:$SNAP/opt/local/FreeCAD-0.19/lib:$LD_LIBRARY_PATH
 export GTK_DATA_PREFIX=$CONFIG_DIR
 export GTK_EXE_PREFIX=$SNAP/usr
 export GDK_PIXBUF_MODULE_FILE=$SNAP/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders.cache
@@ -52,5 +52,5 @@ then
 fi
 export MPLCONFIGDIR="$CONFIG_DIR"
 export GTK2_RC_FILES="$SNAP/usr/share/themes/Raleigh/gtk-2.0/gtkrc"
-exec "$SNAP/opt/local/FreeCAD-0.18/bin/FreeCAD" -u $CONFIG_DIR/user.cfg -s $CONFIG_DIR/system.cfg $@
+exec "$SNAP/opt/local/FreeCAD-0.19/bin/FreeCAD" -u $CONFIG_DIR/user.cfg -s $CONFIG_DIR/system.cfg $@
 

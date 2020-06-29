@@ -27,7 +27,7 @@ echo "Depends:"$3 >> /tmp/$1-$2/DEBIAN/control
 echo "Maintainer:vejmarie@ruggedpod.qyshare.com" >> /tmp/$1-$2/DEBIAN/control
 echo "Homepage:http://ruggedpod.qyshare.com" >> /tmp/$1-$2/DEBIAN/control
 echo "Description:TEST PACKAGE" >> /tmp/$1-$2/DEBIAN/control
-file_list=`ls -ltd $(find /opt/local/FreeCAD-0.18) | awk '{ print $9}'`
+file_list=`ls -ltd $(find /opt/local/FreeCAD-0.19) | awk '{ print $9}'`
 for file in $file_list
 do
   is_done=`cat /tmp/stage | grep $file`
@@ -170,7 +170,7 @@ then
 	cd libMED
 	mkdir build
 	cd build
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 ..
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 ..
 	make -j $CPU
 	sudo make install
 	cd ../..
@@ -194,7 +194,7 @@ then
 	mkdir build
 	cd build
 # cmake .. -DVTK_RENDERING_BACKEND=OpenGL
-	cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 -DVTK_Group_Rendering:BOOL=OFF -DVTK_Group_StandAlone:BOOL=ON -DVTK_RENDERING_BACKEND=None
+	cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DVTK_Group_Rendering:BOOL=OFF -DVTK_Group_StandAlone:BOOL=ON -DVTK_RENDERING_BACKEND=None
 	make -j $CPU
 	sudo make install
 
@@ -220,7 +220,7 @@ then
 	mkdir build
 	cd build
 # cmake .. -DUSE_VTK:BOOL=ON
-	cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 -DUSE_VTK:BOOL=OFF
+	cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DUSE_VTK:BOOL=OFF
 	sudo make -j $CPU
 	sudo make install
 
@@ -238,7 +238,7 @@ if [ "$exist" == "" ]
 then
 	git clone https://github.com/vejmarie/Netgen
 	cd Netgen/netgen-5.3.1
-	./configure --prefix=/opt/local/FreeCAD-0.18 --with-tcl=/usr/lib/tcl8.5 --with-tk=/usr/lib/tk8.5  --enable-occ --with-occ=/opt/local/FreeCAD-0.18 --enable-shared --enable-nglib CXXFLAGS="-DNGLIB_EXPORTS -std=gnu++11"
+	./configure --prefix=/opt/local/FreeCAD-0.19 --with-tcl=/usr/lib/tcl8.5 --with-tk=/usr/lib/tk8.5  --enable-occ --with-occ=/opt/local/FreeCAD-0.19 --enable-shared --enable-nglib CXXFLAGS="-DNGLIB_EXPORTS -std=gnu++11"
 	make -j $CPU
 	sudo make install
 	cd ../..
@@ -263,25 +263,24 @@ rm -rf pivy-0.6.5 0.6.5.tar
 echo "CURRENT DIRECTORY"
 pwd
 git clone $FREECAD_GIT
-git checkout tags/0.18.4 -b 0.18.4
 cd FreeCAD
 git checkout -b $FREECAD_BRANCH origin/$FREECAD_BRANCH
-#cat cMake/FindOpenCasCade.cmake | sed 's/\/usr\/local\/share\/cmake\//\/opt\/local\/FreeCAD-0.18\/lib\/cmake/' > /tmp/FindOpenCasCade.cmake
+#cat cMake/FindOpenCasCade.cmake | sed 's/\/usr\/local\/share\/cmake\//\/opt\/local\/FreeCAD-0.19\/lib\/cmake/' > /tmp/FindOpenCasCade.cmake
 #cp /tmp/FindOpenCasCade.cmake cMake/FindOpenCasCade.cmake
 #cp cMake/FindOpenCasCade.cmake cMake/FindOPENCASCADE.cmake
 cd ..
 mkdir build
 cd build
-# cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DBUILD_FEM_VTK=1 -DBUILD_FEM_NETGEN=1 -DCMAKE_CXX_FLAGS="-DNETGEN_V5"
-cmake ../FreeCAD -DBOOST_PYTHON_SUFFIX=35 -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
+# cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DBUILD_FEM_VTK=1 -DBUILD_FEM_NETGEN=1 -DCMAKE_CXX_FLAGS="-DNETGEN_V5"
+cmake ../FreeCAD -DBOOST_PYTHON_SUFFIX=35 -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
 make -j $CPU
 make -j 4 install
-create_deb FreeCAD 0.18 "netgen (>= 5.3.1), occt (>= 7.0), med (>= 3.10)"
+create_deb FreeCAD 0.19 "netgen (>= 5.3.1), occt (>= 7.0), med (>= 3.10)"
 cd ..
 \rm -rf build
 \rm -rf FreeCAD
 \rm -rf parts
-\rm -rf /tmp/FreeCAD-0.18
+\rm -rf /tmp/FreeCAD-0.19
 source_dir=`pwd`
 cd /tmp
 mkdir deb
@@ -313,11 +312,11 @@ then
         apt-get install -y snapcraft
 #	./generate_yaml.sh
 	snapcraft
-	mv freecad_0.18_amd64.snap /tmp
+	mv freecad_0.19_amd64.snap /tmp
 fi
-if [ -f "/tmp/freecad_0.18_amd64.snap" ]
+if [ -f "/tmp/freecad_0.19_amd64.snap" ]
 then
-	mv /tmp/freecad_0.18_amd64.snap $source_dir/Results
+	mv /tmp/freecad_0.19_amd64.snap $source_dir/Results
 fi
 
-# cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
+# cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
