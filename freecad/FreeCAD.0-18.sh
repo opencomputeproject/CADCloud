@@ -1,7 +1,7 @@
 #!/bin/bash 
 
 # Vagrant provisioning script to build up FreeCAD based on OCCT 7 and Salome 7.7.1 on Linux Ubuntu
-# (c) 2016 Jean-Marie Verdun / vejmarie (jmverdun3@gmail.com)
+# (c) 2016 Jean-Marie Verdun / vejmarie (vejmarie@ruggedpod.qyshare.com)
 # Released under GPL v2.0
 # Provided without any warranty
 # Warning: compilation time is long quite long
@@ -13,6 +13,7 @@ FREECAD_BRANCH="master"
 export CCACHE_DISABLE=1
 CPU=2
 INIT_DISTRO=1
+export home_dir=`pwd`
 
 function create_deb {
 rm -rf /tmp/$1-$2
@@ -24,7 +25,7 @@ echo "Section:base" >> /tmp/$1-$2/DEBIAN/control
 echo "Priority:optional" >> /tmp/$1-$2/DEBIAN/control
 echo "Architecture:amd64" >> /tmp/$1-$2/DEBIAN/control
 echo "Depends:"$3 >> /tmp/$1-$2/DEBIAN/control
-echo "Maintainer:jmverdun3@gmail.com" >> /tmp/$1-$2/DEBIAN/control
+echo "Maintainer:vejmarie@ruggedpod.qyshare.com" >> /tmp/$1-$2/DEBIAN/control
 echo "Homepage:http://ruggedpod.qyshare.com" >> /tmp/$1-$2/DEBIAN/control
 echo "Description:TEST PACKAGE" >> /tmp/$1-$2/DEBIAN/control
 file_list=`ls -ltd $(find /opt/local/FreeCAD-0.18) | awk '{ print $9}'`
@@ -260,11 +261,14 @@ cd ..
 rm -rf pivy-0.6.5 0.6.5.tar
 
 
-echo "CURRENT DIRECTORY"
-pwd
 git clone $FREECAD_GIT
 cd FreeCAD
 git checkout tags/0.18.4 -b 0.18.4
+
+# We must apply the patch as to build on xenial with latest gcc/g++
+cp /vagrant/patches/0.18/0.18.patches .
+patch -p0 < 0.18.patches
+
 #cat cMake/FindOpenCasCade.cmake | sed 's/\/usr\/local\/share\/cmake\//\/opt\/local\/FreeCAD-0.18\/lib\/cmake/' > /tmp/FindOpenCasCade.cmake
 #cp /tmp/FindOpenCasCade.cmake cMake/FindOpenCasCade.cmake
 #cp cMake/FindOpenCasCade.cmake cMake/FindOPENCASCADE.cmake
