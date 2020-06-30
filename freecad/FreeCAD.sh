@@ -264,10 +264,8 @@ rm -rf pivy-0.6.5 0.6.5.tar
 git clone $FREECAD_GIT
 cd FreeCAD
 git checkout tags/0.18.4 -b 0.18.4
-
 # We must apply the patch as to build on xenial with latest gcc/g++
-cp /vagrant/patches/0.18/0.18.patches .
-patch -p0 < 0.18.patches
+for i in `ls /vagrant/patches/0.18/`; do patch -p4  < /vagrant/patches/0.18/$i; done
 
 #cat cMake/FindOpenCasCade.cmake | sed 's/\/usr\/local\/share\/cmake\//\/opt\/local\/FreeCAD-0.18\/lib\/cmake/' > /tmp/FindOpenCasCade.cmake
 #cp /tmp/FindOpenCasCade.cmake cMake/FindOpenCasCade.cmake

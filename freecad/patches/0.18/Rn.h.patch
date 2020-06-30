@@ -1,0 +1,17 @@
+--- /home/vagrant/FreeCAD/src/3rdParty/salomesmesh/inc/Rn.h	2020-06-30 13:30:40.151507228 +0000
++++ /home/vagrant/FreeCAD/src/3rdParty/salomesmesh/inc/Rn.h.new	2020-06-30 13:31:52.443343230 +0000
+@@ -180,12 +180,12 @@
+ {
+   friend std::ostream& operator <<(std::ostream& f, const R4 & P )
+   { f << P.x << ' ' << P.y << ' ' << P.z << ' ' << P.omega; return f; }
+-  friend istream& operator >>(istream& f,  R4 & P)
++  friend std::istream& operator >>(std::istream& f,  R4 & P)
+   { f >> P.x >>  P.y >>  P.z >> P.omega ; return f; }
+ 
+   friend std::ostream& operator <<(std::ostream& f, const R4 * P )
+   { f << P->x << ' ' << P->y << ' ' << P->z << ' ' << P->omega; return f; }
+-  friend istream& operator >>(istream& f,  R4 * P)
++  friend std::istream& operator >>(std::istream& f,  R4 * P)
+   { f >> P->x >>  P->y >>  P->z >> P->omega ; return f; }
+ 
+ public:  
