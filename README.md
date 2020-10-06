@@ -1,7 +1,7 @@
 # CADCloud
 CAD/EDA server
 
-![Image of landing](https://raw.githubusercontent.com/CADCloud/CADCloud/master/screenshot/landing.png)
+![Image of landing](https://raw.githubusercontent.com/opencomputeproject/CADCloud/master/screenshot/landing.png)
 
 ## Description
 This project aims to create a version tracking and collaboration tool to Open Hardware communities. 
