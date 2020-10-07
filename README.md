@@ -14,11 +14,11 @@ To use it you need to either import a STEP file into FreeCAD and export it to th
 
 ```python
 import Cloud \
-Cloud.cloudurl(u"https://YOUR SERVER URI") \
-Cloud.cloudtcpport(u"443") \
-Cloud.cloudaccesskey(u"YOUR ACCESS KEY") \
-Cloud.cloudsecretkey(u"YOUR PRIVATE KEY") \
-Cloud.cloudsave(u"YOUR MODEL NAME (lowercase only)") \
+Cloud.URL(u"https://YOUR SERVER URI") \
+Cloud.TCPPort(u"443") \
+Cloud.TokenAuth(u"YOUR ACCESS KEY") \
+Cloud.TokenSecret(u"YOUR PRIVATE KEY") \
+Cloud.Save(u"YOUR MODEL NAME (lowercase only)") \
 ```
 
 Note: You can export a native FreeCAD file. Though be aware that WebGL rendering is still alpha, though it still could work ;).  
