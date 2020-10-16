@@ -57,6 +57,8 @@ type freecadEntry struct {
          SecretKey string
          URI string
          Port string
+	 DNSDomain string
+	 MasterTcpPort string
          Bucket string
          Revision string
 }
@@ -74,16 +76,27 @@ func createEntry(content string) (int) {
 	defer file.Close()
 	b, err := ioutil.ReadAll(file)
 	var fileContent string
-	port,_ := strconv.Atoi(data.Port)
-	port = port + 1000 + base.MinIOServerBasePort
+ 	var port int
+        if ( data.MasterTcpPort != "" ) {
+                port,_ = strconv.Atoi(data.MasterTcpPort)
+        } else {
+                port,_ = strconv.Atoi(data.Port)
+                port = port + 1000 + base.MinIOServerBasePort
+        }
 	
 	fileContent = string(b)
 	fileContent = strings.Replace(fileContent, "NAME", data.Bucket+"r"+data.Revision, -1)
 	fileContent = strings.Replace(fileContent, "SECRETKEY", data.SecretKey, -1)
 	fileContent = strings.Replace(fileContent, "KEY", data.Key, -1)
-	fileContent = strings.Replace(fileContent, "URI", data.URI, -1)
+        if ( data.DNSDomain != "" ) {
+                fileContent = strings.Replace(fileContent, "URI", data.DNSDomain, -1)
+	        fileContent = strings.Replace(fileContent, "BUCKET", data.Bucket, -1)
+        } else
+        {
+                fileContent = strings.Replace(fileContent, "URI", data.URI, -1)
+	        fileContent = strings.Replace(fileContent, "BUCKET", data.Bucket+"r"+data.Revision, -1)
+        }
 	fileContent = strings.Replace(fileContent, "PORT", strconv.Itoa(port), -1)
-	fileContent = strings.Replace(fileContent, "BUCKET", data.Bucket+"r"+data.Revision, -1)
 	fileContent = strings.Replace(fileContent, "FILE_PATH", FreeCADTMP + data.Key + data.Bucket +"r" + data.Revision +".png", -1 )
 	fileContent = strings.Replace(fileContent, "OBJ_PATH", FreeCADTMP +  data.Key + data.Bucket +"r" + data.Revision +".obj", -1 )
 

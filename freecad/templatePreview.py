@@ -41,4 +41,7 @@ import importOBJ
 importOBJ.export(__objs__,u"OBJ_PATH")
 del __objs__
 
+for documentName in App.listDocuments():
+    App.closeDocument(documentName)
+
 Gui.doCommand('exit()')

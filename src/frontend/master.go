@@ -393,9 +393,18 @@ func home(w http.ResponseWriter, r *http.Request) {
                                         }
                                         if ( path[2] == "GuiDocument.xml" ) {
                                                 contents := GuiContent{}
+						var finalContents []GuiPart
                                                 in := bytes.NewReader([]byte(base.HTTPGetBody(r)))
                                                 _ = xml.NewDecoder(in).Decode(&contents)
-                                                content, _ = json.Marshal(contents.GuiParts)
+						for j,_ := range contents.GuiParts {
+                                                        if ( contents.GuiParts[j].File != "" ) {
+                                                                finalContents = append(finalContents,contents.GuiParts[j])
+                                                        }
+                                                }
+                                                content, _ = json.Marshal(finalContents)
+						if ( string(content) == "null" ) {
+                                                        content = []byte("")
+                                                }
                                         }
                                         // if content is not empty we have to push it to the cache server which will
                                         // be acting as a file tracker
@@ -411,6 +420,9 @@ func home(w http.ResponseWriter, r *http.Request) {
                                                 // let's add all files
                                                 _=base.HTTPPutRequest("http://"+cacheURI+cacheTCPPORT+"/user/"+keys[0]+"/"+path[1]+"/FilesUpdate",content,"application/json")
                                         } else {
+						if ( path[2] == "GuiDocument.xml" ) {
+							_=base.HTTPPutRequest("http://"+cacheURI+cacheTCPPORT+"/user/"+keys[0]+"/"+path[1]+"/FilesUpdate",[]byte(""),"application/json")
+						}
                                                 _=base.HTTPPutRequest("http://"+cacheURI+cacheTCPPORT+"/user/"+keys[0]+"/"+path[1]+"/File",[]byte(path[2]),"application/json")
                                         }
 				}

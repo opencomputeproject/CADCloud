@@ -66,6 +66,8 @@ type minIOEntry struct {
         Ports string
 }
 
+var DNSDomain = os.Getenv("DNS_DOMAIN")
+
 // This is getting a user file entry from the cache
 
 func getEntry(Key string) (string) {
@@ -327,10 +329,18 @@ func deleteFile(Key string, BucketName string,content string) (string) {
 							        SecretKey string
 							        URI string
 							        Port string
+								DNSDomain string
+								MasterTcpPort string
 								Bucket string
 								Revision string
 							}
 							var data freecadEntry
+							if ( DNSDomain != "" ) {
+                                                                data.DNSDomain = DNSDomain
+                                                        } else {
+                                                                data.DNSDomain = "https://127.0.0.1"
+                                                        }
+							data.MasterTcpPort = "443"
 							data.Nickname = cache[i].Nickname
 							data.Key = cache[i].Key
 							data.SecretKey = cache[i].SecretKey
