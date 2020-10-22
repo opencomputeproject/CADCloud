@@ -67,6 +67,8 @@ then
 		add-apt-repository ppa:thopiekar/pyside-git
 		apt-get update
 		package_list="		doxygen                          \
+					libblas3			 \
+					liblapack3			 \
                               		libboost1.58-dev                 \
                                		libboost-filesystem1.58-dev      \
                                		libboost-program-options1.58-dev \
