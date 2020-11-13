@@ -11,11 +11,12 @@ parts:
       fontconfig/fonts.conf : fontconfig/fonts.conf
       etc/matplotlibrc : etc/matplotlibrc
     stage-packages:
+      - git
+      - git-core
       - netgen
       - occt
       - vtk
       - med
-      - libblas3
       - liblapack3
       - freecad
       - doxygen
@@ -118,3 +119,6 @@ apps:
   desktop: opt/local/FreeCAD-0.19/share/applications/org.freecadweb.FreeCAD.desktop
   command: bin/launcher
   plugs: [ locale-control,x11,opengl,network-bind,home,unity7 ]
+  environment:
+      GIT_TEMPLATE_DIR: $SNAP/usr/share/git-core/templates
+      GIT_EXEC_PATH: $SNAP/usr/lib/git-core
