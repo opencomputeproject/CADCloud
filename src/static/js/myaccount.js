@@ -256,7 +256,7 @@ function myAccountCol1createControl()
 		var myJSON='{';
 		RWFormArray.forEach(function(element) {
 			// We must print the variable content except if this is password entry because in that case the real value is
-			// within the global vairable array
+			// within the global variable array
 			if ( element.includes("Password") == true ) {
 				myJSON = myJSON + '"' + element + '":"' + mylocalStorage[element] + '"';
 			}
@@ -284,7 +284,7 @@ function myAccountCol1createControl()
 			if ( response == 'email' || response == 'passwordemail' ) {
 				// We must clear the window and close the session
 				// inform the end user
-				form="<center><h1> Your account has been temporarly deactivated </h1>";
+				form="<center><h1> Your account has been temporarily deactivated </h1>";
 				form=form+"<h2>Please revalidate your email<h2>";
 				form=form+"<h3>Redirecting in 5s<h3>";
 				$('#col1').html(form);
@@ -348,7 +348,7 @@ function myAccountCol1createControl()
 			}
 			if ( response == 'error password' ) {
 				form='<center><h1 style="color: #FF0000"> Password change error </h1>';
-                                form=form + "<h2> There was a password missmatch please retry </h2></center>";
+                                form=form + "<h2> There was a password mismatch please retry </h2></center>";
                                 form=form+"<h3>Redirecting in 5s<h3>";
                                 $('#col1').html(form);
                                 $('#col2').html('');
@@ -422,7 +422,7 @@ function myAccountCol1()
                                                 var obj = JSON.parse( data );
                                                 var myarray = Object.keys(obj);
                                                 for (let i = 0; i  < myarray.length; i++) {
-                                                        // The last 2 characters are giving us the RW informations
+                                                        // The last 2 characters give us the RW information
                                                         // There shall be also a Label ;)
                                                         if ( myarray[i].substr(-2) != "RW" ) {
                                                                 if ( myarray[i].substr(-5) != "LABEL" ) {

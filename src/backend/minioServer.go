@@ -532,7 +532,7 @@ func createMinIOServer(username string, URL string, accessToken string, secretTo
 			}
 		}
 
-		// We need to return some informations like
+		// We need to return some information like
 		// the minIO IP address, the TCPPORT
 		// as to properly configure the reverse proxy and route the traffic to it
 		// We also need to implement the user loopback as to configure the reverse proxy

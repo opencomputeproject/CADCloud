@@ -102,7 +102,7 @@ export MINIO_URI=127.0.0.1
 export CACHE_URI=127.0.0.1
 export CACHE_TCPPORT=:9500
 export TZ=GMT
-echo "Please set the following environement variables in PRODUCTION mode
+echo "Please set the following environment variables in PRODUCTION mode
 export SMTP_SERVER=
 export SMTP_ACCOUNT=
 export SMTP_PASSWORD=
