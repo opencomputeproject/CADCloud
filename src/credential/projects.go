@@ -549,66 +549,46 @@ type Object struct {
 	Objects []Content `xml:"ObjectData>Object"`
 }
 
-type Translate struct {
-	FreeCADName string
-	ModelName string
-	Tag int
+type rawNode struct {
+        label   string
+        freecadName string
+        isReferenced int
         hasShape int
+        isVisible int
+        isGroup int
+        sons []string
 }
 
-func getIndex(label string, tree Object) []int {
-	returnValue := []int { 0,0 }
-	for i:= 0 ; i < len(tree.Objects) ; i++ {
-		if ( tree.Objects[i].Name == label ) {
-		// We have 2 options either this is a Part or an Assembly
-		// If that is an assembly we must look for the Group property
-		// If that is a Part we must look for the Label property
-			for j:=0 ; j < len(tree.Objects[i].Properties) ; j++  {
-	                        if ( tree.Objects[i].Properties[j].Name == "Group" ) {
-					returnValue[1] = j
-				}
-			}
-			returnValue[0] = i
-			return returnValue
-		}
-	}
-	return returnValue
+type rootNode struct {
+        node rawNode
 }
 
-func label(name string, labels []Translate) (string) {
-	for i := 0 ; i < len(labels) ; i++ {
-		if ( labels[i].FreeCADName == name ) {
-			return labels[i].ModelName
-		}
-	}	
-	return ""
-}
 
-func getCode(indexes []int, tree Object, labels []Translate) (string) {
-	var code string
-	code = ""
-	// Shall do that if there is a shape attached to the object not based on the front name of the object
-
-	hasShape := 0
-        for i := 0 ; i < len(labels) ; i++ {
-                if ( labels[i].FreeCADName == tree.Objects[indexes[0]].Name ) {
-                        hasShape = labels[i].hasShape
-                }
+func dumpTree(rootNode rawNode, rawTree []rawNode, spaces int) (string) {
+        var space string
+        var out string
+        for i := 0 ; i < spaces ; i++ {
+                space = space+" "
         }
-
-
-	if ( hasShape == 1 ) {
-		return "<li id='" + tree.Objects[indexes[0]].Name+"'>\n" + label(tree.Objects[indexes[0]].Name, labels) + "</li>\n"
-	} else {
-		code = code + "\n<li>\n" + tree.Objects[indexes[0]].Name + "<ul>\n" 
-		for i := 0 ; i < len(tree.Objects[indexes[0]].Properties[indexes[1]].LinkList) ; i++  {
-			newindexes := []int { 0,0 }
-			newindexes = getIndex(tree.Objects[indexes[0]].Properties[indexes[1]].LinkList[i].Entry, tree)
-			code = code + getCode(newindexes, tree, labels) 
-		}
-		code = code + "\n</ul></li>\n"
-	}
-	return code
+        if ( rootNode.hasShape == 1 ) {
+                if ( rootNode.isVisible == 1 ) {
+                        out = out + space + "<li id='"+ rootNode.freecadName +"'>" + rootNode.label + "</li>\n"
+                }
+        } 
+        if ( len(rootNode.sons) != 0 ) {
+                out = out + space + "<li>" + rootNode.label + "\n<ul>\n"
+                // We must dump the branch
+                // We must find each node based on their freecadName which is into the sons array string
+                for i := 0 ; i < len(rootNode.sons) ; i++ {
+                        for j := 0 ; j < len(rawTree) ; j ++ {
+                                if ( rawTree[j].freecadName == rootNode.sons[i] ) {
+                                        out = out + dumpTree(rawTree[j], rawTree, spaces+1)
+                                }
+                        }
+                }
+                out = out + space + "\n</ul>\n</li>\n"
+        }
+        return out
 }
 
 func getPlayerCode(w http.ResponseWriter, path string, Host string, private int) {
@@ -742,96 +722,76 @@ func getPlayerCode(w http.ResponseWriter, path string, Host string, private int)
 	        if ( err == nil ) {
 	                Document, _ := ioutil.ReadAll(response.Body)
 		contents := Object{}
-		parts := []Translate{}
 
 		// We have to build the tree from the node which are not part of any other nodes
 		// To do that we have 2 kinds of nodes. The One which are Parts, and the one which are Assemblies
 		// We must list them tne loop over them and tag them by being part of an Assembly or not
 		// The one which are not part are the one that we must dump as there leaf will come with them
-		
+
+                // Let's sort the XML content and build an internal tree structure with 3 kind of nodes
+                // root nodes contains nodes which do not have any "father" node
+                // nodes contains nodes with potentially many leafs or nodes insides
+                // leaf contains only single shape node
+                var rawTree []rawNode
+                var rootNodes []rootNode
+
                 in := bytes.NewReader(Document)
                 _ = xml.NewDecoder(in).Decode(&contents)
 
-		objectIndex := []int { 0, 0 }
 
-		// We must keep only the stuff which have a property name label
-		// vejmarie
-		for i:= 0 ; i < len(contents.Objects) ; i++ {
-				hasLinks := 0
-				hasShape := 0
-				visibility := 0
-				var entry Translate
-				for j:=0 ; j < len(contents.Objects[i].Properties) ; j++  {
-					if ( contents.Objects[i].Properties[j].Name == "Label" ) {
-						entry.FreeCADName = contents.Objects[i].Name
-						entry.ModelName = contents.Objects[i].Properties[j].Strings[0].Value
-						entry.Tag = 0
-						entry.hasShape = 0
-					}
-					if ( contents.Objects[i].Properties[j].Name == "Group" ) {
-						hasLinks = 1
-						objectIndex[0] = i
-                                                objectIndex[1] = j
-					}
-					if ( contents.Objects[i].Properties[j].Name == "Shape" ) {
-						hasShape = 1
-						objectIndex[0] = i
-						entry.hasShape = 1
-					}
-					if ( contents.Objects[i].Properties[j].Name == "Visibility" ) {
-                                                if ( contents.Objects[i].Properties[j].Bools[0].Value == true ) {
-                                                        visibility = 1
+                // We must keep only the stuff which have a property name label
+
+                for i:= 0 ; i < len(contents.Objects) ; i++ {
+                        var newNode rawNode
+                        newNode.freecadName = contents.Objects[i].Name
+                        for j:=0 ; j < len(contents.Objects[i].Properties) ; j++  {
+                                switch contents.Objects[i].Properties[j].Name {
+                                        case "Label":
+                                                newNode.label=contents.Objects[i].Properties[j].Strings[0].Value
+                                        case "Group":
+                                                newNode.isGroup = 1
+                                                for l := 0 ; l < len(contents.Objects[i].Properties[j].LinkList) ; l++ {
+                                                        newNode.sons = append(newNode.sons,contents.Objects[i].Properties[j].LinkList[l].Entry)
                                                 }
-                                        }
-				}
-				if (  hasLinks == 0  && hasShape == 1 && visibility == 1) {
-					parts = append(parts,entry)
-				}
-		}
+                                        case "Shape":
+                                                newNode.hasShape = 1
+                                        case "Visibility":
+                                                newNode.isVisible = 1
+                                }
+                        }
+                        rawTree = append(rawTree, newNode)
+                }
 
-		for i:=0 ; i < len(parts) ; i ++ {
-			for j:=0 ; j < len(contents.Objects) ; j++ {
-				for k := 0; k < len(contents.Objects[j].Properties) ; k++ {
-					if ( contents.Objects[j].Properties[k].Name == "Group" ) {
-						for l := 0 ; l < len(contents.Objects[j].Properties[k].LinkList) ; l++ {
-							if ( parts[i].FreeCADName == contents.Objects[j].Properties[k].LinkList[l].Entry ) {
-								parts[i].Tag = 1
-							}
-						}
-					}
-				}
-			}	
-		}
+                // Let's start sorting the raw nodes
+                var isReferred int = 0
+                for  i := 0 ; i < len(rawTree) ; i++ {
+                        for j := 0 ; j < len(rawTree) ; j++ {
+                                                for k := 0 ; k < len(rawTree[j].sons) ; k ++ {
+                                                        if ( rawTree[j].sons[k] == rawTree[i].freecadName ) {
+                                                                isReferred = 1
+                                                        }
+                                                }
+                        }
+                        if ( isReferred==0 ) {
+                                // The node is a root
+                                var newRoot rootNode
+                                newRoot.node = rawTree[i]
+                                rootNodes = append(rootNodes, newRoot)
+                        }
+                        isReferred = 0
+                }
 
-		code := ""
-		if ( len(parts) == 0 ) {
-			code = "<ul id='tree1' style='display:none;'><li>" + getCode(objectIndex, contents, parts) + "</li></ul>"
-		} else {
-			code = "<ul id='tree1' style='display:none;'><li><li>Root</li><ul>"
-			switched := 0
-			for i:=0 ; i < len(parts) ; i ++ {
-				if ( parts[i].Tag == 0 ) {
-					objectIndex[1] = 0;
-					switched = 1
-					code = code +  getCode(objectIndex, contents, parts) 
-				}
-			}
-			if ( switched == 0 ) {
-				code = code +  getCode(objectIndex, contents, parts)
-			}
-			code = code + "</ul></li></ul>"
-		}
-	        contentString = strings.Replace(contentString, "TREE", code, 1)
-
-	        }
+                // We got a list of raw Node we can dump now
+                var Code string
+                Code = "<ul id='tree1' style='display:none;'><li><li>Root</li><ul>"
+                for  i := 0 ; i < len(rootNodes) ; i ++  {
+                        Code = Code + dumpTree(rootNodes[i].node, rawTree, 0)
+                }
+                Code = Code + "</ul></li></ul>"
+                contentString = strings.Replace(contentString, "TREE", Code, 1)
+                w.Write([]byte(contentString))
+        	}
 	}
-
-	// We got the tree
-	
-
-        // I don't need to encode it this is soon made by the users API
-        w.Write([]byte(contentString))
-
 }
 
 func projectPage(w http.ResponseWriter, path string, Host string) {
