@@ -1,6 +1,6 @@
 
 name: freecad
-version: 0.18
+version: 0.19
 summary: development version
 description: development version This version is far from being bug free but integrates the latest FreeCAD technologies
 parts:
@@ -11,40 +11,43 @@ parts:
       fontconfig/fonts.conf : fontconfig/fonts.conf
       etc/matplotlibrc : etc/matplotlibrc
     stage-packages:
+      - git
+      - git-core
       - netgen
-      - occt
       - vtk
+      - occt
       - med
+      - liblapack3
       - freecad
       - doxygen
-      - libboost1.58-dev
-      - libboost-filesystem1.58-dev
-      - libboost-program-options1.58-dev
-      - libboost-python1.58-dev
-      - libboost-regex1.58-dev
-      - libboost-signals1.58-dev
-      - libboost-system1.58-dev
-      - libboost-thread1.58-dev
-      - libcoin80v5
-      - libcoin80-dev
+      - libblas3
+      - libboost1.67-dev
+      - libboost-filesystem1.67-dev
+      - libboost-program-options1.67-dev
+      - libboost-python1.67-dev
+      - libboost-regex1.67-dev
+      - libboost-signals1.67-dev
+      - libboost-system1.67-dev
+      - libboost-thread1.67-dev
+      - libcoin80c
+      - libcoin-dev
       - libqt5webkit5-dev
       - libqt5svg5-dev
       - libqt5xmlpatterns5-dev
       - libqt5widgets5
       - libqt5quickwidgets5
       - libqt5multimediawidgets5
-      - libtcl8.5
-      - libtk8.5
+      - libtcl8.6
+      - libtk8.6
       - libsz2
       - libwind0-heimdal
-      - python3-pyside2
-      - libshiboken-py3-2.0
+      - libpyside2-dev
+      - libshiboken2-dev
       - libsasl2-2
       - librtmp1
       - libroken18-heimdal
-      - libpython3.5
-      - libpython3.5-minimal
-      - libpyside2.0
+      - libpython3.8
+      - libpython3.8-minimal
       - libldap-2.4-2
       - libhx509-5-heimdal
       - libkrb5-26-heimdal
@@ -53,11 +56,11 @@ parts:
       - libhcrypto4-heimdal
       - libgssapi3-heimdal
       - libcurl3-gnutls
-      - libcurl3
+      - libcurl4
       - libasn1-8-heimdal
       - libaec0
-      - libhdf5-10
-      - libxerces-c3.1
+      - libhdf5-103
+      - libxerces-c3.2
       - libfreetype6-dev
       - libxt-dev
       - libxmu-dev
@@ -75,6 +78,8 @@ parts:
       - python3-dateutil
       - python3-git
       - python3-ply
+      - python3-pip
+      - python3-pivy
       - graphviz
       - calculix-ccx
       - libc-bin
@@ -89,8 +94,8 @@ parts:
     override-stage: |
       snapcraftctl stage
       sed -i -E \
-        "s|^Icon=(.*)|Icon=\${SNAP}/opt/local/FreeCAD-0.18/share/icons/hicolor/scalable/apps/org.freecadweb.FreeCAD.svg|g" \
-        opt/local/FreeCAD-0.18/share/applications/org.freecadweb.FreeCAD.desktop
+        "s|^Icon=(.*)|Icon=\${SNAP}/opt/local/FreeCAD-0.19/share/icons/hicolor/scalable/apps/org.freecadweb.FreeCAD.svg|g" \
+        opt/local/FreeCAD-0.19/share/applications/org.freecadweb.FreeCAD.desktop
     prime:
       - bin
       - etc
@@ -101,17 +106,16 @@ parts:
       - usr/libx86_64-linux-gnu/
       - usr/bin
       - usr/share
-      - -opt/local/FreeCAD-0.18/share/docs
-      - -opt/local/FreeCAD-0.18/share/doc
-      - -opt/local/FreeCAD-0.18/include
- pivy:
-    plugin: python
-    source: https://github.com/CADCloud/pivy.git
-    python-version: python3
+      - -opt/local/FreeCAD-0.19/share/docs
+      - -opt/local/FreeCAD-0.19/share/doc
+      - -opt/local/FreeCAD-0.19/include
 
 apps:
  freecad:
   common-id: org.freecadweb.FreeCAD.desktop
-  desktop: opt/local/FreeCAD-0.18/share/applications/org.freecadweb.FreeCAD.desktop
+  desktop: opt/local/FreeCAD-0.19/share/applications/org.freecadweb.FreeCAD.desktop
   command: bin/launcher
   plugs: [ locale-control,x11,opengl,network-bind,home,unity7 ]
+  environment:
+      GIT_TEMPLATE_DIR: $SNAP/usr/share/git-core/templates
+      GIT_EXEC_PATH: $SNAP/usr/lib/git-core
