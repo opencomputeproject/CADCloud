@@ -44,7 +44,7 @@ export QT_QPA_FONTDIR="$SNAP/usr/share/fonts"
 export XDG_DATA_HOME="$SNAP/usr/share/icons"
 export XDG_DATA_DIRS="$SNAP/usr/share/mime"
 export FONTCONFIG_PATH="$SNAP/etc/fonts"
-\cp -rf $SNAP/fontconfig $CONFIG_DIR
+#\cp -rf $SNAP/fontconfig $CONFIG_DIR
 if [ ! -d "$CONFIG_DIR/.cache/fontconfig" ]
 then
 ($SNAP/usr/bin/fc-cache --really-force --verbose) >& /dev/null

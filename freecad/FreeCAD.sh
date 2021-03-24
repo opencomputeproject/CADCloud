@@ -116,6 +116,7 @@ then
 			echo "$ubuntu_version detected"
 	                apt-get update
 			package_list="  doxygen                          \
+					rapidjson-dev			\
                                         libblas3                         \
                                         liblapack3                       \
                                         libboost1.67-dev                 \
@@ -274,7 +275,7 @@ then
 	mkdir build
 	cd build
 # cmake .. -DUSE_VTK:BOOL=ON
-	cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DUSE_VTK:BOOL=OFF
+	cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DUSE_VTK:BOOL=OFF -DHAVE_RAPIDJSON:BOOL=ON
 	sudo make -j $CPU
 	sudo make install
 
@@ -338,7 +339,7 @@ git checkout -b $FREECAD_BRANCH origin/$FREECAD_BRANCH
 cd ..
 mkdir build
 cd build
-cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DBUILD_FEM_VTK=1 -DBUILD_FEM_NETGEN=1 -DCMAKE_CXX_FLAGS="-DNETGEN_V5" -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
+cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DBUILD_FEM_VTK=1 -DBUILD_FEM_NETGEN=1 -DCMAKE_CXX_FLAGS="-DNETGEN_V5" -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=OFF
 # cmake ../FreeCAD -DBOOST_PYTHON_SUFFIX=35 -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
 make -j $CPU
 touch doc/freecad.qch
@@ -380,7 +381,7 @@ then
 	rm -rf etc
         apt-get install -y snapcraft
 #	./generate_yaml.sh
-	snapcraft
+	snapcraft install multipass
 	cp bin/launcher.0-19 bin/launcher
 	time snapcraft --destructive-mode
 	mv freecad_0.19_amd64.snap /tmp

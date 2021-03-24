@@ -1,19 +1,21 @@
-
 name: freecad
-version: 0.19
+base: core20
+version: "0.19"
 summary: development version
 description: development version This version is far from being bug free but integrates the latest FreeCAD technologies
 parts:
  example-part:
-    plugin: copy
-    files:
-      bin/launcher : bin/launcher
-      fontconfig/fonts.conf : fontconfig/fonts.conf
-      etc/matplotlibrc : etc/matplotlibrc
+    source: .
+    plugin: dump
+    organize:
+      'launcher' : bin/launcher
     stage-packages:
       - git
+      - rapidjson-dev
       - git-core
       - netgen
+      - fontconfig
+      - fontconfig-config
       - vtk
       - occt
       - med
@@ -31,7 +33,7 @@ parts:
       - libboost-thread1.67-dev
       - libcoin80c
       - libcoin-dev
-      - libqt5webkit5-dev
+      - qtwebengine5-dev
       - libqt5svg5-dev
       - libqt5xmlpatterns5-dev
       - libqt5widgets5
@@ -83,6 +85,7 @@ parts:
       - graphviz
       - calculix-ccx
       - libc-bin
+      - libqt5webkit5
       - locales
       - debconf
       - ttf-bitstream-vera
@@ -91,6 +94,67 @@ parts:
       - xfonts-utils
       - xfonts-scalable
       - fonts-dejavu-core
+      - python-pyqt5.qwt-doc
+      - python3-dbus.mainloop.pyqt5
+      - python3-pyqt5
+      - python3-pyqt5.qsci
+      - python3-pyqt5.qtchart
+      - python3-pyqt5.qtmultimedia
+      - python3-pyqt5.qtopengl
+      - python3-pyqt5.qtpositioning
+      - python3-pyqt5.qtquick
+      - python3-pyqt5.qtsensors
+      - python3-pyqt5.qtserialport
+      - python3-pyqt5.qtsql
+      - python3-pyqt5.qtsvg
+      - python3-pyqt5.qtwebchannel
+      - python3-pyqt5.qtwebengine
+      - python3-pyqt5.qtwebkit
+      - python3-pyqt5.qtwebsockets
+      - python3-pyqt5.qtx11extras
+      - python3-pyqt5.qtxmlpatterns
+      - python3-pyqt5.qwt
+      - libpyside2-py3-5.14
+      - pyside2-tools
+      - python3-pyside2.qt3dcore
+      - python3-pyside2.qt3dinput
+      - python3-pyside2.qt3dlogic
+      - python3-pyside2.qt3drender
+      - python3-pyside2.qtcharts
+      - python3-pyside2.qtconcurrent
+      - python3-pyside2.qtcore
+      - python3-pyside2.qtdatavisualization
+      - python3-pyside2.qtgui
+      - python3-pyside2.qthelp
+      - python3-pyside2.qtlocation
+      - python3-pyside2.qtmultimedia
+      - python3-pyside2.qtmultimediawidgets
+      - python3-pyside2.qtnetwork
+      - python3-pyside2.qtopengl
+      - python3-pyside2.qtopenglfunctions
+      - python3-pyside2.qtpositioning
+      - python3-pyside2.qtprintsupport
+      - python3-pyside2.qtqml
+      - python3-pyside2.qtquick
+      - python3-pyside2.qtquickwidgets
+      - python3-pyside2.qtscript
+      - python3-pyside2.qtscripttools
+      - python3-pyside2.qtscxml
+      - python3-pyside2.qtsensors
+      - python3-pyside2.qtsql
+      - python3-pyside2.qtsvg
+      - python3-pyside2.qttest
+      - python3-pyside2.qttexttospeech
+      - python3-pyside2.qtuitools
+      - python3-pyside2.qtwebchannel
+      - python3-pyside2.qtwebengine
+      - python3-pyside2.qtwebenginecore
+      - python3-pyside2.qtwebenginewidgets
+      - python3-pyside2.qtwebsockets
+      - python3-pyside2.qtwidgets
+      - python3-pyside2.qtx11extras
+      - python3-pyside2.qtxml
+      - python3-pyside2.qtxmlpatterns
     override-stage: |
       snapcraftctl stage
       sed -i -E \
@@ -99,11 +163,9 @@ parts:
     prime:
       - bin
       - etc
-      - fontconfig
       - opt
       - lib
       - usr/lib
-      - usr/libx86_64-linux-gnu/
       - usr/bin
       - usr/share
       - -opt/local/FreeCAD-0.19/share/docs
@@ -115,7 +177,7 @@ apps:
   common-id: org.freecadweb.FreeCAD.desktop
   desktop: opt/local/FreeCAD-0.19/share/applications/org.freecadweb.FreeCAD.desktop
   command: bin/launcher
-  plugs: [ locale-control,x11,opengl,network-bind,home,unity7 ]
+  plugs: [ desktop,desktop-legacy,wayland,browser-support,network,locale-control,x11,opengl,network-bind,home,unity7 ]
   environment:
       GIT_TEMPLATE_DIR: $SNAP/usr/share/git-core/templates
       GIT_EXEC_PATH: $SNAP/usr/lib/git-core
