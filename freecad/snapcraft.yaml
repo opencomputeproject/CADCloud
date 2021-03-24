@@ -1,50 +1,55 @@
-
 name: freecad
-version: 0.18
+base: core20
+version: "0.19"
 summary: development version
 description: development version This version is far from being bug free but integrates the latest FreeCAD technologies
 parts:
  example-part:
-    plugin: copy
-    files:
-      bin/launcher : bin/launcher
-      fontconfig/fonts.conf : fontconfig/fonts.conf
-      etc/matplotlibrc : etc/matplotlibrc
+    source: .
+    plugin: dump
+    organize:
+      'launcher' : bin/launcher
     stage-packages:
+      - git
+      - rapidjson-dev
+      - git-core
       - netgen
-      - occt
+      - fontconfig
+      - fontconfig-config
       - vtk
+      - occt
       - med
+      - liblapack3
       - freecad
       - doxygen
-      - libboost1.58-dev
-      - libboost-filesystem1.58-dev
-      - libboost-program-options1.58-dev
-      - libboost-python1.58-dev
-      - libboost-regex1.58-dev
-      - libboost-signals1.58-dev
-      - libboost-system1.58-dev
-      - libboost-thread1.58-dev
-      - libcoin80v5
-      - libcoin80-dev
-      - libqt5webkit5-dev
+      - libblas3
+      - libboost1.67-dev
+      - libboost-filesystem1.67-dev
+      - libboost-program-options1.67-dev
+      - libboost-python1.67-dev
+      - libboost-regex1.67-dev
+      - libboost-signals1.67-dev
+      - libboost-system1.67-dev
+      - libboost-thread1.67-dev
+      - libcoin80c
+      - libcoin-dev
+      - qtwebengine5-dev
       - libqt5svg5-dev
       - libqt5xmlpatterns5-dev
       - libqt5widgets5
       - libqt5quickwidgets5
       - libqt5multimediawidgets5
-      - libtcl8.5
-      - libtk8.5
+      - libtcl8.6
+      - libtk8.6
       - libsz2
       - libwind0-heimdal
-      - python3-pyside2
-      - libshiboken-py3-2.0
+      - libpyside2-dev
+      - libshiboken2-dev
       - libsasl2-2
       - librtmp1
       - libroken18-heimdal
-      - libpython3.5
-      - libpython3.5-minimal
-      - libpyside2.0
+      - libpython3.8
+      - libpython3.8-minimal
       - libldap-2.4-2
       - libhx509-5-heimdal
       - libkrb5-26-heimdal
@@ -53,11 +58,11 @@ parts:
       - libhcrypto4-heimdal
       - libgssapi3-heimdal
       - libcurl3-gnutls
-      - libcurl3
+      - libcurl4
       - libasn1-8-heimdal
       - libaec0
-      - libhdf5-10
-      - libxerces-c3.1
+      - libhdf5-103
+      - libxerces-c3.2
       - libfreetype6-dev
       - libxt-dev
       - libxmu-dev
@@ -75,9 +80,12 @@ parts:
       - python3-dateutil
       - python3-git
       - python3-ply
+      - python3-pip
+      - python3-pivy
       - graphviz
       - calculix-ccx
       - libc-bin
+      - libqt5webkit5
       - locales
       - debconf
       - ttf-bitstream-vera
@@ -86,32 +94,90 @@ parts:
       - xfonts-utils
       - xfonts-scalable
       - fonts-dejavu-core
+      - python-pyqt5.qwt-doc
+      - python3-dbus.mainloop.pyqt5
+      - python3-pyqt5
+      - python3-pyqt5.qsci
+      - python3-pyqt5.qtchart
+      - python3-pyqt5.qtmultimedia
+      - python3-pyqt5.qtopengl
+      - python3-pyqt5.qtpositioning
+      - python3-pyqt5.qtquick
+      - python3-pyqt5.qtsensors
+      - python3-pyqt5.qtserialport
+      - python3-pyqt5.qtsql
+      - python3-pyqt5.qtsvg
+      - python3-pyqt5.qtwebchannel
+      - python3-pyqt5.qtwebengine
+      - python3-pyqt5.qtwebkit
+      - python3-pyqt5.qtwebsockets
+      - python3-pyqt5.qtx11extras
+      - python3-pyqt5.qtxmlpatterns
+      - python3-pyqt5.qwt
+      - libpyside2-py3-5.14
+      - pyside2-tools
+      - python3-pyside2.qt3dcore
+      - python3-pyside2.qt3dinput
+      - python3-pyside2.qt3dlogic
+      - python3-pyside2.qt3drender
+      - python3-pyside2.qtcharts
+      - python3-pyside2.qtconcurrent
+      - python3-pyside2.qtcore
+      - python3-pyside2.qtdatavisualization
+      - python3-pyside2.qtgui
+      - python3-pyside2.qthelp
+      - python3-pyside2.qtlocation
+      - python3-pyside2.qtmultimedia
+      - python3-pyside2.qtmultimediawidgets
+      - python3-pyside2.qtnetwork
+      - python3-pyside2.qtopengl
+      - python3-pyside2.qtopenglfunctions
+      - python3-pyside2.qtpositioning
+      - python3-pyside2.qtprintsupport
+      - python3-pyside2.qtqml
+      - python3-pyside2.qtquick
+      - python3-pyside2.qtquickwidgets
+      - python3-pyside2.qtscript
+      - python3-pyside2.qtscripttools
+      - python3-pyside2.qtscxml
+      - python3-pyside2.qtsensors
+      - python3-pyside2.qtsql
+      - python3-pyside2.qtsvg
+      - python3-pyside2.qttest
+      - python3-pyside2.qttexttospeech
+      - python3-pyside2.qtuitools
+      - python3-pyside2.qtwebchannel
+      - python3-pyside2.qtwebengine
+      - python3-pyside2.qtwebenginecore
+      - python3-pyside2.qtwebenginewidgets
+      - python3-pyside2.qtwebsockets
+      - python3-pyside2.qtwidgets
+      - python3-pyside2.qtx11extras
+      - python3-pyside2.qtxml
+      - python3-pyside2.qtxmlpatterns
     override-stage: |
       snapcraftctl stage
       sed -i -E \
-        "s|^Icon=(.*)|Icon=\${SNAP}/opt/local/FreeCAD-0.18/share/icons/hicolor/scalable/apps/org.freecadweb.FreeCAD.svg|g" \
-        opt/local/FreeCAD-0.18/share/applications/org.freecadweb.FreeCAD.desktop
+        "s|^Icon=(.*)|Icon=\${SNAP}/opt/local/FreeCAD-0.19/share/icons/hicolor/scalable/apps/org.freecadweb.FreeCAD.svg|g" \
+        opt/local/FreeCAD-0.19/share/applications/org.freecadweb.FreeCAD.desktop
     prime:
       - bin
       - etc
-      - fontconfig
       - opt
       - lib
       - usr/lib
-      - usr/libx86_64-linux-gnu/
       - usr/bin
       - usr/share
-      - -opt/local/FreeCAD-0.18/share/docs
-      - -opt/local/FreeCAD-0.18/share/doc
-      - -opt/local/FreeCAD-0.18/include
- pivy:
-    plugin: python
-    source: https://github.com/CADCloud/pivy.git
-    python-version: python3
+      - -opt/local/FreeCAD-0.19/share/docs
+      - -opt/local/FreeCAD-0.19/share/doc
+      - -opt/local/FreeCAD-0.19/include
 
 apps:
  freecad:
   common-id: org.freecadweb.FreeCAD.desktop
-  desktop: opt/local/FreeCAD-0.18/share/applications/org.freecadweb.FreeCAD.desktop
+  desktop: opt/local/FreeCAD-0.19/share/applications/org.freecadweb.FreeCAD.desktop
   command: bin/launcher
-  plugs: [ locale-control,x11,opengl,network-bind,home,unity7 ]
+  plugs: [ desktop,desktop-legacy,wayland,browser-support,network,locale-control,x11,opengl,network-bind,home,unity7 ]
+  environment:
+      GIT_TEMPLATE_DIR: $SNAP/usr/share/git-core/templates
+      GIT_EXEC_PATH: $SNAP/usr/lib/git-core

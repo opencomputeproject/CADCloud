@@ -23,7 +23,7 @@ export LANG=$LOC
 export LANGUAGE=${LANG%_*}
 export LIBGL_DRIVERS_PATH=$SNAP/usr/lib/x86_64-linux-gnu/dri
 export GTK_PATH=$SNAP/usr/lib/x86_64-linux-gnu/gtk-2.0/modules
-export LD_LIBRARY_PATH=$SNAP/usr/lib:$SNAP/usr/lib/x86_64-linux-gnu/gio/modules:$SNAP/usr/lib/x86_64-linux-gnu/gtk-2.0/modules:$SNAP/opt/local/FreeCAD-0.19/lib:$SNAP/usr/lib/lapack:$SNAP/usr/lib/libblas:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$SNAP/usr/lib:$SNAP/usr/lib/x86_64-linux-gnu/gio/modules:$SNAP/usr/lib/x86_64-linux-gnu/gtk-2.0/modules:$SNAP/opt/local/FreeCAD-0.19/lib:$SNAP/usr/lib/lapack:$SNAP/usr/lib/libblas:$SNAP/usr/lib/x86_64-linux-gnu/blas:$SNAP/usr/lib/x86_64-linux-gnu/lapack:$LD_LIBRARY_PATH
 export GTK_DATA_PREFIX=$CONFIG_DIR
 export GTK_EXE_PREFIX=$SNAP/usr
 export GDK_PIXBUF_MODULE_FILE=$SNAP/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders.cache
@@ -44,7 +44,7 @@ export QT_QPA_FONTDIR="$SNAP/usr/share/fonts"
 export XDG_DATA_HOME="$SNAP/usr/share/icons"
 export XDG_DATA_DIRS="$SNAP/usr/share/mime"
 export FONTCONFIG_PATH="$SNAP/etc/fonts"
-\cp -rf $SNAP/fontconfig $CONFIG_DIR
+#\cp -rf $SNAP/fontconfig $CONFIG_DIR
 if [ ! -d "$CONFIG_DIR/.cache/fontconfig" ]
 then
 ($SNAP/usr/bin/fc-cache --really-force --verbose) >& /dev/null

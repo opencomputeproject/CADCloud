@@ -9,11 +9,10 @@
 # Must add a lightdm start / reboot ?
 export LC_ALL=en_US.UTF-8
 FREECAD_GIT="https://github.com/FreeCAD/FreeCAD.git"
-FREECAD_BRANCH="master"
+FREECAD_BRANCH="releases/FreeCAD-0-19"
 export CCACHE_DISABLE=1
-CPU=2
+CPU=4
 INIT_DISTRO=1
-export home_dir=`pwd`
 
 function create_deb {
 rm -rf /tmp/$1-$2
@@ -25,10 +24,10 @@ echo "Section:base" >> /tmp/$1-$2/DEBIAN/control
 echo "Priority:optional" >> /tmp/$1-$2/DEBIAN/control
 echo "Architecture:amd64" >> /tmp/$1-$2/DEBIAN/control
 echo "Depends:"$3 >> /tmp/$1-$2/DEBIAN/control
-echo "Maintainer:vejmarie@ruggedpod.qyshare.com" >> /tmp/$1-$2/DEBIAN/control
-echo "Homepage:http://ruggedpod.qyshare.com" >> /tmp/$1-$2/DEBIAN/control
+echo "Maintainer:jmverdun3@gmail.com" >> /tmp/$1-$2/DEBIAN/control
+echo "Homepage:http://justyour.parts" >> /tmp/$1-$2/DEBIAN/control
 echo "Description:TEST PACKAGE" >> /tmp/$1-$2/DEBIAN/control
-file_list=`ls -ltd $(find /opt/local/FreeCAD-0.18) | awk '{ print $9}'`
+file_list=`ls -ltd $(find /opt/local/FreeCAD-0.19) | awk '{ print $9}'`
 for file in $file_list
 do
   is_done=`cat /tmp/stage | grep $file`
@@ -65,8 +64,11 @@ then
 	        if [ "$ubuntu_version" == "xenial" ]
 	        then
 		add-apt-repository ppa:thopiekar/pyside-git
+		add-apt-repository ppa:beineri/opt-qt-5.15.2-bionic
 		apt-get update
 		package_list="		doxygen                          \
+					libblas3			 \
+					liblapack3			 \
                               		libboost1.58-dev                 \
                                		libboost-filesystem1.58-dev      \
                                		libboost-program-options1.58-dev \
@@ -110,22 +112,78 @@ then
                                		calculix-ccx                     \
 					qttools5-dev			\
                                		swig"
+		else
+			echo "$ubuntu_version detected"
+	                apt-get update
+			package_list="  doxygen                          \
+					rapidjson-dev			\
+                                        libblas3                         \
+                                        liblapack3                       \
+                                        libboost1.67-dev                 \
+                                        libboost-filesystem1.67-dev      \
+                                        libboost-program-options1.67-dev \
+                                        libboost-python1.67-dev          \
+                                        libboost-regex1.67-dev           \
+                                        libboost-signals1.67-dev         \
+                                        libboost-system1.67-dev          \
+					libboost-thread1.67-dev          \
+                                        libcoin80c                       \
+                                        libcoin-dev                      \
+                                        libeigen3-dev                    \
+                                        libxerces-c-dev                  \
+                                        libxmu-dev                       \
+					python3-dev			\
+                                        libxmu-headers                   \
+                                        libxmu6                          \
+                                        libxmuu-dev                      \
+                                        libxmuu1                         \
+                                        python-dev                       \
+                                        python3-dev                      \
+                                        python3-numpy                    \
+					libpyside2-dev			\
+					libshiboken2-dev		\
+					pyside2-tools			\
+                                        python3-matplotlib                \
+					pyqt5-dev-tools			\
+                                        libqt5webkit5-dev               \
+                                        libqt5svg5-dev                  \
+                                        libqt5xmlpatterns5-dev          \
+                                        libcurl4-openssl-dev            \
+                                        libssl-dev                      \
+                                        calculix-ccx                     \
+                                        qttools5-dev                    \
+					python3-pyside2.qtgui		\
+					python3-pyside2.qtwidgets	\
+					python3-pip			\
+					python3-pivy			\
+					python3-pyside2.qtSvg		\
+                                        swig"
+		pyside2=`apt search python3-pyside2 | grep focal | awk '{ print $1 }' | sed 's/\/focal,now//' | sed 's/\/focal//'`
+		for i in $pyside2
+		do
+			sudo apt install  -y $i
+		done
 		fi
 	fi
 	sudo apt-get update
 	sudo apt-get install -y dictionaries-common
 	sudo apt-get install -y $package_list
+	sudo apt-get install -y shiboken2
 	sudo apt-get install -y python-pivy
 	sudo apt-get install -y git
 	sudo apt-get install -y cmake
 	sudo apt-get install -y g++
 	sudo apt-get install -y libfreetype6-dev
-	sudo apt-get install -y tcl8.5-dev tk8.5-dev
+	sudo apt-get install -y tcl8.6-dev tk8.6-dev
 	sudo apt-get install -y libtogl-dev
 	sudo apt-get install -y libhdf5-dev
+	export DEBIAN_FRONTEND=noninteractive
+	sudo mkdir /etc/X11
+	sudo cat /etc/X11/default-display-manager
+	sudo echo /usr/sbin/lightdm > /etc/X11/default-display-manager
+	sudo DEBIAN_FRONTEND="noninteractive" apt install -y lightdm
 	sudo apt-get install -y xfce4 xfce4-goodies
 	sudo apt-get install -y xubuntu-default-settings
-	sudo apt-get install -y lightdm
 	sudo apt-get install -y automake
 	sudo apt-get install -y libcanberra-gtk-module
 	sudo apt-get install -y libcanberra-gtk3-module overlay-scrollbar-gtk2 unity-gtk-module-common libatk-bridge2.0-0 unity-gtk2-module libatk-adaptor
@@ -159,8 +217,7 @@ fi
 rm /usr/lib/x86_64-linux-gnu/libboost_python.so
 ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python.so
 # This is to workaround a bug into the Path module
-cp /usr/lib/x86_64-linux-gnu/libboost_python-py35.so /usr/lib/x86_64-linux-gnu/libboost_python-py27.so
-
+cp /usr/lib/x86_64-linux-gnu/libboost_python-py36.so /usr/lib/x86_64-linux-gnu/libboost_python-py27.so
 
 # Building MED
 
@@ -171,7 +228,7 @@ then
 	cd libMED
 	mkdir build
 	cd build
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 ..
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 ..
 	make -j $CPU
 	sudo make install
 	cd ../..
@@ -187,33 +244,30 @@ fi
 exist=`ls /tmp/deb/VTK*deb`
 if [ "$exist" == "" ]
 then
-	wget http://www.vtk.org/files/release/7.0/VTK-7.0.0.tar.gz
-	gunzip VTK-7.0.0.tar.gz
-	tar xf VTK-7.0.0.tar
-	rm VTK-7.0.0.tar
-	cd VTK-7.0.0
+	wget https://www.vtk.org/files/release/8.2/VTK-8.2.0.tar.gz
+	gunzip VTK-8.2.0.tar.gz
+	tar xf VTK-8.2.0.tar
+	rm VTK-8.2.0.tar
+	cd VTK-8.2.0
 	mkdir build
 	cd build
 # cmake .. -DVTK_RENDERING_BACKEND=OpenGL
-	cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 -DVTK_Group_Rendering:BOOL=OFF -DVTK_Group_StandAlone:BOOL=ON -DVTK_RENDERING_BACKEND=None
+	cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DVTK_Group_Rendering:BOOL=OFF -DVTK_Group_StandAlone:BOOL=ON -DVTK_RENDERING_BACKEND=None
 	make -j $CPU
 	sudo make install
 
-	create_deb VTK 7.0 ""
+	create_deb VTK 8.2.0 ""
 	cd ../..
-	rm -rf VTK-7.0.0
+	rm -rf VTK-8.2.0
 fi
 
 # Building OCCT
 exist=`ls /tmp/deb/OCC*deb`
 if [ "$exist" == "" ]
 then
-	wget "http://git.dev.opencascade.org/gitweb/?p=occt.git;a=snapshot;h=fd47711d682be943f0e0a13d1fb54911b0499c31;sf=tgz"
-	mv "index.html?p=occt.git;a=snapshot;h=fd47711d682be943f0e0a13d1fb54911b0499c31;sf=tgz" occt.tgz
-	gunzip occt.tgz
-	tar xf occt.tar
-	rm occt.tar
-	cd occt-fd47711
+	git clone https://github.com/Open-Cascade-SAS/OCCT
+	cd OCCT
+	git checkout 628c0211d53c7fe1036a85e7a7b2b067c9c50f7a
 	grep -v vtkRenderingFreeTypeOpenGL src/TKIVtk/EXTERNLIB >& /tmp/EXTERNLIB
 	\cp /tmp/EXTERNLIB src/TKIVtk/EXTERNLIB
 	grep -v vtkRenderingFreeTypeOpenGL src/TKIVtkDraw/EXTERNLIB >& /tmp/EXTERNLIB
@@ -221,68 +275,81 @@ then
 	mkdir build
 	cd build
 # cmake .. -DUSE_VTK:BOOL=ON
-	cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 -DUSE_VTK:BOOL=OFF
+	cmake .. -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DUSE_VTK:BOOL=OFF -DHAVE_RAPIDJSON:BOOL=ON
 	sudo make -j $CPU
 	sudo make install
 
-	create_deb OCCT 7.4 "vtk (>= 7.0), med (>= 3.10)"
+	create_deb OCCT 7.5 "vtk (>= 8.2.0), med (>= 3.10)"
 	cd ../..
-	rm -rf occt-fd47711
-	rm -rf /tmp/OCCT-7.4/
+	rm -rf OCCT
+	rm -rf /tmp/OCCT-7.5/
 fi
 
 # Building Netgen
 
+git clone https://github.com/NGSolve/netgen
+cd netgen
+mkdir build
+cd build
+cat ../CMakeLists.txt | sed 's/OpenCasCade/OpenCASCADE/' > /tmp/CMakeLists.txt
+cat /tmp/CMakeLists.txt | sed 's/OCC_INCLUDE_DIR/OpenCASCADE_INCLUDE_DIR/' > ../CMakeLists.txt
+cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19  -DCMAKE_PREFIX_PATH=/opt/local/FreeCAD-0.19/lib/cmake/opencascade  -DUSE_GUI=OFF -DUSE_PYTHON=OFF -DUSE_OCC=ON ..
+cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 ..
+make -j $CPU
+make install
+cd ../..
+create_deb Netgenfc 6.2 "occt (>= 7.0)"
 
-exist=`ls /tmp/deb/Net*deb`
-if [ "$exist" == "" ]
-then
-	git clone https://github.com/vejmarie/Netgen
-	cd Netgen/netgen-5.3.1
-	./configure --prefix=/opt/local/FreeCAD-0.18 --with-tcl=/usr/lib/tcl8.5 --with-tk=/usr/lib/tk8.5  --enable-occ --with-occ=/opt/local/FreeCAD-0.18 --enable-shared --enable-nglib CXXFLAGS="-DNGLIB_EXPORTS -std=gnu++11"
-	make -j $CPU
-	sudo make install
-	cd ../..
-	sudo cp -rf Netgen/netgen-5.3.1 /usr/share/netgen
-	create_deb Netgen 5.3.1 "occt (>= 7.0)"
-	rm -rf Netgen
-	rm -rf /tmp/Netgen-5.3.1
-fi
+# exist=`ls /tmp/deb/Net*deb`
+# if [ "$exist" == "" ]
+# then
+# 	git clone https://github.com/vejmarie/Netgen
+# 	cd Netgen/netgen-5.3.1
+# 	./configure --prefix=/opt/local/FreeCAD-0.19 --with-tcl=/usr/lib/tcl8.6 --with-tk=/usr/lib/tk8.6  --enable-occ --with-occ=/opt/local/FreeCAD-0.19 --enable-shared --enable-nglib CXXFLAGS="-DNGLIB_EXPORTS -std=gnu++11"
+#cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DUSE_OCC=TRUE -DOCC_INCLUDE_DIR:PATH=/opt/local/FreeCAD-0.19/include/ -DUSE_PYTHON=OFF -DUSE_GUI=OFF ..
+# 	make -j $CPU
+# 	sudo make install
+# 	cd ../..
+# 	sudo cp -rf Netgen/netgen-5.3.1 /usr/share/netgen
+# 	create_deb Netgen 5.3.1 "occt (>= 7.0)"
+# 	rm -rf Netgen
+# 	rm -rf /tmp/Netgen-5.3.1
+# fi
 # We have to build OpenSSL
 #building FreeCAD
 
-wget https://github.com/coin3d/pivy/archive/0.6.5.tar.gz
-gunzip 0.6.5.tar.gz
-tar xf 0.6.5.tar
-cd pivy-0.6.5/
-python3 setup_old.py build
-sudo python3 setup_old.py install
-cd ..
-rm -rf pivy-0.6.5 0.6.5.tar
+# wget https://github.com/coin3d/pivy/archive/0.6.5.tar.gz
+# gunzip 0.6.5.tar.gz
+# tar xf 0.6.5.tar
+# cd pivy-0.6.5/
+# python3 setup_old.py build
+# sudo python3 setup_old.py install
+# cd ..
+# rm -rf pivy-0.6.5 0.6.5.tar
 
 
+echo "CURRENT DIRECTORY"
+pwd
 git clone $FREECAD_GIT
 cd FreeCAD
-git checkout tags/0.18.4 -b 0.18.4
-# We must apply the patch as to build on xenial with latest gcc/g++
-for i in `ls /vagrant/patches/0.18/`; do patch -p4  < /vagrant/patches/0.18/$i; done
-
-#cat cMake/FindOpenCasCade.cmake | sed 's/\/usr\/local\/share\/cmake\//\/opt\/local\/FreeCAD-0.18\/lib\/cmake/' > /tmp/FindOpenCasCade.cmake
+git checkout -b $FREECAD_BRANCH origin/$FREECAD_BRANCH
+#cat cMake/FindOpenCasCade.cmake | sed 's/\/usr\/local\/share\/cmake\//\/opt\/local\/FreeCAD-0.19\/lib\/cmake/' > /tmp/FindOpenCasCade.cmake
 #cp /tmp/FindOpenCasCade.cmake cMake/FindOpenCasCade.cmake
 #cp cMake/FindOpenCasCade.cmake cMake/FindOPENCASCADE.cmake
 cd ..
 mkdir build
 cd build
-# cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DBUILD_FEM_VTK=1 -DBUILD_FEM_NETGEN=1 -DCMAKE_CXX_FLAGS="-DNETGEN_V5"
-cmake ../FreeCAD -DBOOST_PYTHON_SUFFIX=35 -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON -DBUILD_FEM_NETGEN=1 -DCMAKE_CXX_FLAGS="-DNETGEN_V5"
+cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DBUILD_FEM_VTK=1 -DBUILD_FEM_NETGEN=1 -DCMAKE_CXX_FLAGS="-DNETGEN_V5" -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=OFF
+# cmake ../FreeCAD -DBOOST_PYTHON_SUFFIX=35 -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
 make -j $CPU
+touch doc/freecad.qch
 make -j 4 install
-create_deb FreeCAD 0.18 "netgen (>= 5.3.1), occt (>= 7.0), med (>= 3.10)"
+create_deb FreeCAD 0.19 "netgenfc (>= 5.3.1), occt (>= 7.0), med (>= 3.10)"
 cd ..
 \rm -rf build
 \rm -rf FreeCAD
 \rm -rf parts
-\rm -rf /tmp/FreeCAD-0.18
+\rm -rf /tmp/FreeCAD-0.19
 source_dir=`pwd`
 cd /tmp
 mkdir deb
@@ -302,7 +369,7 @@ cd $current_dir
 echo "deb [trusted=yes] file://$source_dir/Results /" >> /etc/apt/sources.list
 apt-get update
 
-if [ "$ubuntu_version" == "xenial" ]
+if [ "$ubuntu_version" == "focal" ]
 then
 #Let's build the snap
 	export LC_ALL="en_US.UTF-8"
@@ -311,14 +378,17 @@ then
 	mkdir snap
 	cd snap
 	cp -Rf /vagrant/* .
+	rm -rf etc
         apt-get install -y snapcraft
 #	./generate_yaml.sh
-	snapcraft
-	mv freecad_0.18_amd64.snap /tmp
+	snapcraft install multipass
+	cp bin/launcher.0-19 bin/launcher
+	time snapcraft --destructive-mode
+	mv freecad_0.19_amd64.snap /tmp
 fi
-if [ -f "/tmp/freecad_0.18_amd64.snap" ]
+if [ -f "/tmp/freecad_0.19_amd64.snap" ]
 then
-	mv /tmp/freecad_0.18_amd64.snap $source_dir/Results
+	mv /tmp/freecad_0.19_amd64.snap $source_dir/Results
 fi
 
-# cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.18 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
+# cmake ../FreeCAD -DCMAKE_INSTALL_PREFIX:PATH=/opt/local/FreeCAD-0.19 -DBUILD_CLOUD=1 -DALLOW_SELF_SIGNED_CERTIFICATE=1 -DBUILD_FEM=1 -DPYTHON_EXECUTABLE=/usr/bin/python3 -DBUILD_QT5=ON -DFREECAD_USE_QWEBKIT:BOOL=ON
