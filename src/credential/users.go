@@ -92,14 +92,14 @@ func userGetInfo(nickname string) (*userPublic) {
 		return_value.TokenAuth = temp_value.TokenAuth
 		return_value.TokenAuthRW = "0"
 		return_value.TokenSecret = temp_value.TokenSecret
-		return_value.TokenSecretLABEL = "TokenType, TokenAuth and TokenSecret are private values that you shouldn't share with anybody. They are automatically assigned to you as to provide you unique authentication capabilities to JustYour.Parts services. Use them to connect you to the service through FreeCAD or an Amazon s3 compliant client. Please refer to our end user documentation for further informations."
+		return_value.TokenSecretLABEL = "TokenType, TokenAuth and TokenSecret are private values that you shouldn't share with anybody. They are automatically assigned to you as to provide you unique authentication capabilities to JustYour.Parts services. Use them to connect you to the service through FreeCAD or an Amazon s3 compliant client. Please refer to our end user documentation for further information."
 		return_value.TokenSecretRW = "0"
 		return_value.CreationDate = temp_value.CreationDate
 		return_value.CreationDateRW = "0"
 		return_value.Lastlogin = temp_value.Lastlogin
 		return_value.LastloginRW = "0"
 		return_value.Email = temp_value.Email
-		return_value.EmailLABEL = "Your primary email address. It won't be shared with anybody except if you explicitely activate that feature into the privacy field. Warning your email address must be verified each time you change it. During that process your account is disabled and can't be recovered without contacting us."
+		return_value.EmailLABEL = "Your primary email address. It won't be shared with anybody except if you explicitly activate that feature into the privacy field. Warning your email address must be verified each time you change it. During that process your account is disabled and can't be recovered without contacting us."
 		return_value.EmailRW = "1"
 	}
 	
@@ -143,7 +143,7 @@ func updateAccount(username string, w http.ResponseWriter, r *http.Request) (boo
 
 	_ = json.Unmarshal(getJSON, &newData)
 
-	// So now let's run some comparaison
+	// So now let's run some comparison
 	if ( updatedData.Active == 0 ) {
         	http.Error(w, "401 User not activated Please check email", 401)
                 return false

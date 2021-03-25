@@ -660,7 +660,7 @@ func getPlayerCode(w http.ResponseWriter, path string, Host string, private int)
 
 	contentString := strings.Replace(string(content), "MODELSOURCE", fullPath, 1)
 
-	// We must use the NEWCODE stuff to request additionnal object parts
+	// We must use the NEWCODE stuff to request additional object parts
 	code := ""
 
 	if ( partNbInt != -1 ) {
@@ -939,7 +939,7 @@ func recomputeProject(w http.ResponseWriter, r *http.Request, path string, priva
                 data.Key = keys[0]
                 data.SecretKey = secretKey
                 data.URI = urlhost
-                // We need to substract the base port
+                // We need to subtract the base port
                 // from the urlport
                 i, _ := strconv.Atoi(urlport)
                 i = i - base.MinIOServerBasePort
@@ -1038,7 +1038,7 @@ func userCallback(w http.ResponseWriter, r *http.Request) {
 		case http.MethodGet:
 			context := strings.Split(r.URL.Path, "/")	
 			// Check anonymous call
-			// We must do that test only if the retreived data is private
+			// We must do that test only if the retrieved data is private
 			// If it is not private
 			if ( checkAccess(w,r,context[2]) ) {
 				keyWords := strings.Split(r.URL.Path, "/")
@@ -1225,10 +1225,10 @@ func main() {
     print("| Private use only            |\n")
     print("=============================== \n")
 
-    // The project backend data are stored within a minio instances
-    // These datas are the metadatas of the end user and we shall be sure that
-    // they are resilient to system crash etc
-    // We also need to be sure that they scale per server
+    // The project backend data is stored within a minio instance
+    // This data is the metadata of the end user and we should be sure that
+    // it is resilient to system crashes etc...
+    // We also need to be sure that it scales per server
 
     start_minio()
 

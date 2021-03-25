@@ -293,7 +293,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 			// This code is looking for the TCP port and the URL of the minio server corresponding
 			// to the user defined with its public key
-			// We excute there the original request
+			// We execute there the original request
 
 			keys := strings.Split(words[1],":")
 			cacheURI := os.Getenv("CACHE_URI")

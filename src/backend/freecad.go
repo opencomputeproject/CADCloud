@@ -102,7 +102,7 @@ func createEntry(content string) (int) {
 
 	// FileContent contains the script to be executed by FreeCAD it will generate a file preview and a Wavefront OBJ format
 	// this file shall be put into the ctrlr0 bucket from the user account
-	// We must pass it to FreeCAD but this is a scarce ressource and that shall be done properly
+	// We must pass it to FreeCAD but this is a scarce resource and that shall be done properly
 	// If we got a system crash or whatever
 
 	// We are storing each FreeCAD script to the file system and use a named pipe to process the file
