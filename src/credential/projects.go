@@ -126,7 +126,7 @@ func createEntry(content string) {
 
 	method := "PUT"
 
-	_, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", []byte(content), "", data.Key, data.SecretToken)
+	_, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", []byte(content), "", data.Key, data.SecretToken)
 
 }
 
@@ -173,7 +173,7 @@ func moveEntry(r *http.Request, content string) {
 
 		method := "PUT"
 
-		_, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", []byte(contents), "", data.Key, data.SecretToken)
+		_, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", []byte(contents), "", data.Key, data.SecretToken)
 
 		// Now let's delete the source
 
@@ -185,7 +185,7 @@ func moveEntry(r *http.Request, content string) {
 
 		method = "DELETE"
 
-		_, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+		_, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, "", data.Key, data.SecretToken)
 
 	}
 
@@ -217,7 +217,7 @@ func getList(username string) string {
 	// That is a new request so let's do it
 	var response *http.Response
 
-	response, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, q.Encode(), data.Key, data.SecretToken)
+	response, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, q.Encode(), data.Key, data.SecretToken)
 
 	defer response.Body.Close()
 	contents, _ := ioutil.ReadAll(response.Body)
@@ -285,7 +285,7 @@ func getList(username string) string {
 			q.Add("max-keys", "1000")
 			q.Add("continuation-token", XMLcontents.NextContinuationToken)
 
-			response, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, q.Encode(), data.Key, data.SecretToken)
+			response, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, q.Encode(), data.Key, data.SecretToken)
 
 			defer response.Body.Close()
 			contents, _ = ioutil.ReadAll(response.Body)
@@ -307,7 +307,7 @@ func getList(username string) string {
 
 		method = "GET"
 
-		response, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+		response, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, "", data.Key, data.SecretToken)
 
 		defer response.Body.Close()
 		contents, _ = ioutil.ReadAll(response.Body)
@@ -408,7 +408,7 @@ func getJSONEntry(Path string, private int) string {
 
 	method := "GET"
 
-	response, _ := base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+	response, _ := base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, "", data.Key, data.SecretToken)
 
 	defer response.Body.Close()
 	contents, _ := ioutil.ReadAll(response.Body)
@@ -432,7 +432,7 @@ func getMagnet(w http.ResponseWriter, Path string, private int) {
 	realPort, _ := strconv.Atoi(dataFreeCAD.Port)
 	realPort = realPort + 1000 + base.MinIOServerBasePort
 
-	response, _ := base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPath, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
+	response, _ := base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPATH, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
 
 	defer response.Body.Close()
 	content, _ := ioutil.ReadAll(response.Body)
@@ -455,7 +455,7 @@ func getMagnetRaw(w http.ResponseWriter, Path string, private int) {
 	realPort, _ := strconv.Atoi(dataFreeCAD.Port)
 	realPort = realPort + 1000 + base.MinIOServerBasePort
 
-	response, _ := base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPath, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
+	response, _ := base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPATH, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
 
 	defer response.Body.Close()
 	content, _ := ioutil.ReadAll(response.Body)
@@ -604,7 +604,7 @@ func getPlayerCode(w http.ResponseWriter, path string, Host string, private int)
 	realPort, _ := strconv.Atoi(dataFreeCAD.Port)
 	realPort = realPort + 1000 + base.MinIOServerBasePort
 	var err error
-	response, err = base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPath, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
+	response, err = base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPATH, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
 
 	defer response.Body.Close()
 	partNbInt := -1
@@ -666,7 +666,7 @@ func getPlayerCode(w http.ResponseWriter, path string, Host string, private int)
 	realPort, _ = strconv.Atoi(dataFreeCAD.Port)
 	realPort = realPort + 1000 + base.MinIOServerBasePort
 
-	response, err = base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPath, "application/octet-stream", nil, "", data.Key, data.SecretToken)
+	response, err = base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPATH, "application/octet-stream", nil, "", data.Key, data.SecretToken)
 
 	defer response.Body.Close()
 	nodes := -1
@@ -689,7 +689,7 @@ func getPlayerCode(w http.ResponseWriter, path string, Host string, private int)
 		realPort, _ = strconv.Atoi(dataFreeCAD.Port)
 		realPort = realPort + 1000 + base.MinIOServerBasePort
 
-		response, err = base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPath, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
+		response, err = base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPATH, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
 
 		defer response.Body.Close()
 		if err == nil {
@@ -819,7 +819,7 @@ func projectPage(w http.ResponseWriter, path string, Host string) {
 	          // That is a new request so let's do it
 	          var response *http.Response
 
-	          response,_ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, q.Encode(), data.Key, data.SecretToken)
+	          response,_ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, q.Encode(), data.Key, data.SecretToken)
 
 	*/
 
@@ -829,7 +829,7 @@ func projectPage(w http.ResponseWriter, path string, Host string) {
 	realPort, _ := strconv.Atoi(dataFreeCAD.Port)
 	realPort = realPort + 1000 + base.MinIOServerBasePort
 
-	response, _ := base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPath, "application/xml", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
+	response, _ := base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPATH, "application/xml", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
 
 	defer response.Body.Close()
 	mycontent, _ := ioutil.ReadAll(response.Body)
@@ -947,7 +947,7 @@ func getModel(w http.ResponseWriter, path string, private int) {
 
 	method := "GET"
 
-	response, _ := base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+	response, _ := base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, "", data.Key, data.SecretToken)
 
 	defer response.Body.Close()
 	contents, _ := ioutil.ReadAll(response.Body)
@@ -962,7 +962,7 @@ func getModel(w http.ResponseWriter, path string, private int) {
 	realPort, _ := strconv.Atoi(dataFreeCAD.Port)
 	realPort = realPort + 1000 + base.MinIOServerBasePort
 
-	response, _ = base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPath, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
+	response, _ = base.Request(method, "http://"+dataFreeCAD.URI+":"+strconv.Itoa(realPort)+fullPATH, fullPATH, "application/octet-stream", nil, "", dataFreeCAD.Key, dataFreeCAD.SecretKey)
 
 	defer response.Body.Close()
 	content, _ := ioutil.ReadAll(response.Body)
@@ -1077,7 +1077,6 @@ var storageURI = os.Getenv("STORAGE_URI")
 var storageTCPPORT = os.Getenv("STORAGE_TCPPORT")
 var minIOURI = os.Getenv("MINIO_URI")
 var minIOTCPPORT = os.Getenv("MINIO_TCPPORT")
-var projectURI = os.Getenv("PROJECT_URI")
 
 func startminio() {
 
@@ -1129,13 +1128,13 @@ func startminio() {
 
 		method := "GET"
 
-		response, err := base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+		response, err := base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, "", data.Key, data.SecretToken)
 
 		if err != nil {
 			// Error might be caused by the fact that the daemon is not running yet
 			for err != nil {
 				time.Sleep(1 * time.Second)
-				response, err = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+				response, err = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, "", data.Key, data.SecretToken)
 			}
 		}
 
@@ -1156,12 +1155,12 @@ func startminio() {
 				// We must create the bucket
 				fullPATH := "/" + value + "/"
 				method := "PUT"
-				_, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+				_, _ = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, "", data.Key, data.SecretToken)
 				init = 1
 			}
 			if XMLcontents.CodeName == "XMinioServerNotInitialized" {
 				time.Sleep(1 * time.Second)
-				response, err = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPath, "application/xml", nil, "", data.Key, data.SecretToken)
+				response, err = base.Request(method, "http://"+projectURI+projectMinIOPort+fullPATH, fullPATH, "application/xml", nil, "", data.Key, data.SecretToken)
 			}
 			if XMLcontents.CodeName == "" {
 				// there has been no error so we can safely exit the loop

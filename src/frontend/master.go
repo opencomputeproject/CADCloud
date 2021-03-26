@@ -62,7 +62,7 @@ type content struct {
 
 type guicontent struct {
 	XMLName  xml.Name  `xml:"Document"`
-	GuiParts []guipart `xml:"ViewProviderData>ViewProvider>Properties>Property>ColorList"`
+	Guiparts []guipart `xml:"ViewProviderData>ViewProvider>Properties>Property>ColorList"`
 }
 
 type part struct {
@@ -256,7 +256,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 		// Is this an AWS request ?
 		words := strings.Fields(r.Header.Get("Authorization"))
 		if words[0] == "AWS" {
-			var content []byte
+			var reqcontent []byte
 			// we must reroute the request and let minIO answer to it
 			// but first we must get the user account info
 			// based on the keyAccess
@@ -379,21 +379,21 @@ func home(w http.ResponseWriter, r *http.Request) {
 						contents := content{}
 						in := bytes.NewReader([]byte(base.HTTPGetBody(r)))
 						_ = xml.NewDecoder(in).Decode(&contents)
-						content, _ = json.Marshal(contents.parts)
+						reqcontent, _ = json.Marshal(contents.Parts)
 					}
 					if path[2] == "GuiDocument.xml" {
 						contents := guicontent{}
 						var finalContents []guipart
 						in := bytes.NewReader([]byte(base.HTTPGetBody(r)))
 						_ = xml.NewDecoder(in).Decode(&contents)
-						for j := range contents.guiparts {
-							if contents.guiparts[j].File != "" {
-								finalContents = append(finalContents, contents.guiparts[j])
+						for j := range contents.Guiparts {
+							if contents.Guiparts[j].File != "" {
+								finalContents = append(finalContents, contents.Guiparts[j])
 							}
 						}
-						content, _ = json.Marshal(finalContents)
-						if string(content) == "null" {
-							content = []byte("")
+						reqcontent, _ = json.Marshal(finalContents)
+						if string(reqcontent) == "null" {
+							reqcontent = []byte("")
 						}
 					}
 					// if content is not empty we have to push it to the cache server which will
@@ -406,9 +406,9 @@ func home(w http.ResponseWriter, r *http.Request) {
 					cacheURI := os.Getenv("CACHE_URI")
 					cacheTCPPORT := os.Getenv("CACHE_TCPPORT")
 
-					if len(content) > 0 {
+					if len(reqcontent) > 0 {
 						// let's add all files
-						_ = base.HTTPPutRequest("http://"+cacheURI+cacheTCPPORT+"/user/"+keys[0]+"/"+path[1]+"/FilesUpdate", content, "application/json")
+						_ = base.HTTPPutRequest("http://"+cacheURI+cacheTCPPORT+"/user/"+keys[0]+"/"+path[1]+"/FilesUpdate", reqcontent, "application/json")
 					} else {
 						if path[2] == "GuiDocument.xml" {
 							_ = base.HTTPPutRequest("http://"+cacheURI+cacheTCPPORT+"/user/"+keys[0]+"/"+path[1]+"/FilesUpdate", []byte(""), "application/json")
