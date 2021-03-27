@@ -57,7 +57,7 @@ type freecadEntry struct {
 	SecretKey     string
 	URI           string
 	Port          string
-	DNSDomain     string
+	Dnsdomain     string
 	MasterTCPPort string
 	Bucket        string
 	Revision      string
@@ -88,8 +88,8 @@ func createEntry(content string) int {
 	fileContent = strings.Replace(fileContent, "NAME", data.Bucket+"r"+data.Revision, -1)
 	fileContent = strings.Replace(fileContent, "SECRETKEY", data.SecretKey, -1)
 	fileContent = strings.Replace(fileContent, "KEY", data.Key, -1)
-	if data.DNSDomain != "" {
-		fileContent = strings.Replace(fileContent, "URI", data.DNSDomain, -1)
+	if data.Dnsdomain != "" {
+		fileContent = strings.Replace(fileContent, "URI", data.Dnsdomain, -1)
 		fileContent = strings.Replace(fileContent, "BUCKET", data.Bucket, -1)
 	} else {
 		fileContent = strings.Replace(fileContent, "URI", data.URI, -1)

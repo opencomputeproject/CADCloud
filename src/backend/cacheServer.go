@@ -322,16 +322,16 @@ func deleteFile(Key string, BucketName string, content string) string {
 								SecretKey     string
 								URI           string
 								Port          string
-								dnsdomain     string
+								Dnsdomain     string
 								MasterTCPPort string
 								Bucket        string
 								Revision      string
 							}
 							var data freecadEntry
 							if dnsdomain != "" {
-								data.dnsdomain = dnsdomain
+								data.Dnsdomain = dnsdomain
 							} else {
-								data.dnsdomain = "https://127.0.0.1"
+								data.Dnsdomain = "https://127.0.0.1"
 							}
 							data.MasterTCPPort = "443"
 							data.Nickname = cache[i].Nickname
