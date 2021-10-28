@@ -181,3 +181,4 @@ apps:
   environment:
       GIT_TEMPLATE_DIR: $SNAP/usr/share/git-core/templates
       GIT_EXEC_PATH: $SNAP/usr/lib/git-core
+      GIT_CONFIG_NOSYSTEM: 1
